@@ -1,7 +1,8 @@
 import type { StaticImageData } from "next/image";
-import placeholder from "../../public/images/placeholder.png";
-import { messages, type Language } from "@/lib/languages";
+
 import { requireAtLeastOne, type NonEmptyArray } from "@/lib/arrays";
+import { messages, type Language } from "@/lib/languages";
+import placeholder from "../../public/images/placeholder.png";
 
 type ProjectAsset = {
   src: StaticImageData | string;

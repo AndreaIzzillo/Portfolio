@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useState } from "react";
+
 import { useLanguage } from "@/components/language-provider";
 import type { ProjectImage } from "@/data/projects";
 import type { NonEmptyArray } from "@/lib/arrays";

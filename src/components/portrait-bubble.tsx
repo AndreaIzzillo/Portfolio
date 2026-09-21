@@ -3,9 +3,10 @@
 import Image, { type StaticImageData } from "next/image";
 import { motion } from "motion/react";
 import type { CSSProperties, MouseEventHandler } from "react";
-import portrait from "../../public/images/portrait.jpg";
+
 import { useLanguage } from "@/components/language-provider";
 import { useMagneticPull } from "@/hooks/use-magnetic-pull";
+import portrait from "../../public/images/portrait.jpg";
 
 type BubbleProps = {
   image: StaticImageData | string;

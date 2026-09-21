@@ -2,7 +2,6 @@ import type { CSSProperties } from "react";
 
 const ribbons = ["mint", "sky", "lilac", "peach"] as const;
 
-/** Decorative only: CSS keeps the ambient motion independent of hydration. */
 export function DreamBackground() {
   return (
     <div className="dream-background" aria-hidden="true">

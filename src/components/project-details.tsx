@@ -2,10 +2,11 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import type { Project } from "@/data/projects";
+
 import { useLanguage } from "@/components/language-provider";
 import { LanguageToggle } from "@/components/language-toggle";
 import { ProjectGallery } from "@/components/project-gallery";
+import type { Project } from "@/data/projects";
 
 export type BubbleOrigin = { x: number; y: number };
 

@@ -2,13 +2,14 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useMemo, useRef, useState } from "react";
-import { FloatingBubble, PortraitBubble } from "@/components/portrait-bubble";
-import { projects as sourceProjects, localizeProject } from "@/data/projects";
+
 import { useLanguage } from "@/components/language-provider";
-import { ProjectDetails, type BubbleOrigin } from "@/components/project-details";
 import { OrbitParticles } from "@/components/orbit-particles";
-import { getProjectOffsets } from "@/lib/orbit-layout";
+import { FloatingBubble, PortraitBubble } from "@/components/portrait-bubble";
+import { ProjectDetails, type BubbleOrigin } from "@/components/project-details";
+import { localizeProject, projects as sourceProjects } from "@/data/projects";
 import { useElementSize } from "@/hooks/use-element-size";
+import { getProjectOffsets } from "@/lib/orbit-layout";
 
 export function ProjectOrbit() {
   const { language, t } = useLanguage();

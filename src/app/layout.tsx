@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+
 import { DreamBackground } from "@/components/dream-background";
 import { LanguageProvider } from "@/components/language-provider";
+
 import "./globals.css";
 
 export const metadata: Metadata = {

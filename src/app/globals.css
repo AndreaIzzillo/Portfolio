@@ -233,6 +233,7 @@ body {
 .project-orbit__center {
   z-index: 2;
 }
+
 .project-orbit__slot {
   z-index: 1;
 }
@@ -444,6 +445,7 @@ body {
   height: 44px;
   flex-shrink: 0;
 }
+
 .language-toggle {
   position: fixed;
   top: max(22px, env(safe-area-inset-top));
@@ -458,6 +460,7 @@ body {
     radial-gradient(ellipse at 30% 0%, #ffffff, transparent 65%),
     linear-gradient(145deg, #e2f1e8, #e7e5f3);
 }
+
 .language-toggle--dialog {
   position: absolute;
   top: 18px;
@@ -465,16 +468,19 @@ body {
   width: 44px;
   height: 44px;
 }
+
 :lang(ja) .project-detail h2 {
   letter-spacing: 0;
   line-height: 1.35;
 }
+
 .glass-link {
   padding: 12px 18px;
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
 }
+
 .glass-link--demo {
   background: linear-gradient(180deg, #f4f2ff, #e5e1f0);
 }
@@ -487,6 +493,7 @@ body {
       inset 0 1px 0 #fff,
       0 5px 12px #526d7626;
   }
+
   .project-gallery__image:not(:disabled):hover .project-gallery__hint {
     background: #ffffffeb;
   }
@@ -504,6 +511,7 @@ body {
   min-width: 0;
   text-align: center;
 }
+
 .project-gallery__halo {
   position: absolute;
   inset: -10px -10px 75px;
@@ -527,16 +535,20 @@ body {
   cursor: pointer;
   isolation: isolate;
 }
+
 .project-gallery__image:disabled {
   cursor: default;
 }
+
 .project-gallery__frame {
   position: absolute;
   inset: 0;
 }
+
 .project-gallery__asset {
   object-fit: contain;
 }
+
 .project-gallery__gloss {
   position: absolute;
   inset: 0;
@@ -547,6 +559,7 @@ body {
     inset 0 3px 4px #ffffffa1,
     inset 0 -4px 20px #c4dce475;
 }
+
 .project-gallery__hint {
   position: absolute;
   bottom: 22px;
@@ -561,6 +574,7 @@ body {
   font-size: 11px;
   transition: background 0.2s ease;
 }
+
 .project-gallery__navigation {
   position: relative;
   display: flex;
@@ -569,11 +583,13 @@ body {
   gap: 16px;
   margin-top: 20px;
 }
+
 .project-gallery__dots {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
 }
+
 .project-gallery__dots button {
   display: grid;
   place-items: center;
@@ -581,6 +597,7 @@ body {
   height: 36px;
   cursor: pointer;
 }
+
 .project-gallery__dots button::after {
   content: "";
   width: 6px;
@@ -589,11 +606,13 @@ body {
   background: #b8caca;
   transition: width 0.2s ease;
 }
+
 .project-gallery__dots button[aria-current="true"]::after {
   width: 18px;
   border-radius: 6px;
   background: #688c98;
 }
+
 .project-gallery__count {
   position: relative;
   margin-top: 10px;
@@ -602,6 +621,7 @@ body {
   letter-spacing: 0.18em;
   font-variant-numeric: tabular-nums;
 }
+
 .project-detail__eyebrow {
   display: inline-block;
   margin-bottom: 18px;
@@ -610,6 +630,7 @@ body {
   letter-spacing: 0.2em;
   color: #617f81;
 }
+
 .project-detail h2 {
   margin: 0;
   font-size: clamp(28px, 4vw, 44px);
@@ -618,12 +639,14 @@ body {
   font-weight: 500;
   overflow-wrap: anywhere;
 }
+
 .project-detail__subtitle {
   margin-top: 14px;
   font-size: 16px;
   line-height: 1.6;
   color: #587379;
 }
+
 .project-detail__divider {
   width: 64px;
   height: 2px;
@@ -631,12 +654,14 @@ body {
   border-radius: 2px;
   background: linear-gradient(90deg, #a9d4c6, #c8c4e2, transparent);
 }
+
 .project-detail__description {
   font-size: 14px;
   line-height: 1.85;
   color: #50696f;
   overflow-wrap: anywhere;
 }
+
 .project-detail__actions {
   display: flex;
   flex-wrap: wrap;
@@ -648,19 +673,23 @@ body {
   .project-detail-dialog {
     padding: 16px;
   }
+
   .project-detail {
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
     padding: 60px 26px 30px;
     max-height: calc(100dvh - 32px);
   }
+
   .project-gallery {
     width: min(270px, 100%);
     margin-inline: auto;
   }
+
   .project-detail__eyebrow {
     margin-bottom: 12px;
   }
+
   .project-detail__divider {
     margin-block: 18px;
   }
@@ -671,6 +700,7 @@ body {
     background: #dce8ed00;
     backdrop-filter: blur(0);
   }
+
   to {
     background: #dce8ed75;
     backdrop-filter: blur(9px);
@@ -681,6 +711,7 @@ body {
     background: #dce8ed75;
     backdrop-filter: blur(9px);
   }
+
   to {
     background: #dce8ed00;
     backdrop-filter: blur(0);
@@ -692,19 +723,23 @@ body {
   .project-orbit[data-open="true"] + .portfolio-slogan {
     transition: none;
   }
+
   .project-detail-dialog::backdrop {
     animation: none;
   }
+
   .glass-control,
   .glass-link,
   .project-gallery__hint,
   .project-gallery__dots button::after {
     transition: none;
   }
+
   .glass-control:hover,
   .glass-link:hover {
     transform: none;
   }
+
   .dream-ribbon,
   .dream-ribbon__shape,
   .portrait-float,

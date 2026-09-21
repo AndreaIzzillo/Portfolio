@@ -2,17 +2,18 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "motion/react";
-import { getProjectOffsets } from "@/lib/orbit-layout";
-import { mapNonEmpty } from "@/lib/arrays";
 
-const colors = [
+import { mapNonEmpty } from "@/lib/arrays";
+import { getProjectOffsets } from "@/lib/orbit-layout";
+
+const COLORS = [
   "91, 174, 160",
   "110, 158, 206",
   "170, 141, 201",
   "200, 155, 126",
   "106, 178, 192",
 ] as const;
-const tau = Math.PI * 2;
+const TAU = Math.PI * 2;
 
 // Stable seeds keep the constellation continuous through open/close and resize.
 function noise(seed: number) {
@@ -54,7 +55,7 @@ export function OrbitParticles({
     const particles = Array.from({ length: count }, (_, index) => ({
       group: index % 5,
       seed: noise(index + 1),
-      phase: noise(index + 101) * tau,
+      phase: noise(index + 101) * TAU,
       radius: 0.8 + noise(index + 201) * 1.8,
       trail: [] as { x: number; y: number }[],
     }));
@@ -106,7 +107,7 @@ export function OrbitParticles({
           cx + target.x,
           cy + target.y,
         );
-        context.strokeStyle = `rgba(${colors[group]}, ${p * 0.18})`;
+        context.strokeStyle = `rgba(${COLORS[group]}, ${p * 0.18})`;
         context.lineWidth = 0.8;
         context.stroke();
       });
@@ -114,7 +115,7 @@ export function OrbitParticles({
       // A soft expanding pressure wave punctuates the opening without a flash.
       if (burst > 0.02 && !reducedMotion) {
         context.beginPath();
-        context.arc(cx, cy, coreRadius + 12 + p * 105, 0, tau);
+        context.arc(cx, cy, coreRadius + 12 + p * 105, 0, TAU);
         context.strokeStyle = `rgba(140, 188, 197, ${burst * 0.22})`;
         context.lineWidth = 1;
         context.stroke();
@@ -147,7 +148,7 @@ export function OrbitParticles({
         const x = cx + startX * (1 - p) + endX * p + Math.cos(angle + p * 2) * swirl;
         const y = cy + startY * (1 - p) + endY * p + Math.sin(angle + p * 2) * swirl;
         const alpha = 0.35 + 0.4 * (0.5 + 0.5 * Math.sin(time * 1.4 + particle.phase));
-        const color = colors[particle.group % colors.length] ?? colors[0];
+        const color = COLORS[particle.group % COLORS.length] ?? COLORS[0];
 
         // Short trails only during the explosion or reabsorption; no full-screen blur.
         if (burst > 0.08 && particle.trail.length > 1 && !reducedMotion) {
@@ -176,7 +177,7 @@ export function OrbitParticles({
           particle.radius * 8,
         );
         context.beginPath();
-        context.arc(x, y, particle.radius, 0, tau);
+        context.arc(x, y, particle.radius, 0, TAU);
         context.fillStyle = `rgba(${color}, ${alpha})`;
         context.fill();
 

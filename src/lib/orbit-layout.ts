@@ -1,3 +1,5 @@
+import { requireAtLeastOne, type NonEmptyArray } from "@/lib/arrays";
+
 type RelativePosition = readonly [x: number, y: number];
 export type ProjectOffset = { x: number; y: number };
 
@@ -25,4 +27,3 @@ export function getProjectOffsets(width: number, height: number): NonEmptyArray<
     "The project layout must contain at least one position.",
   );
 }
-import { requireAtLeastOne, type NonEmptyArray } from "@/lib/arrays";

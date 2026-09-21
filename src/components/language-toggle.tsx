@@ -7,6 +7,7 @@ export function LanguageToggle({ inDialog = false }: { inDialog?: boolean }) {
   const { language, cycleLanguage, t } = useLanguage();
   const next = getNextLanguage(language);
   const label = `${languageNames[language]} · ${t.switchLanguage(languageNames[next])}`;
+
   return (
     <button
       type="button"
