@@ -9,7 +9,7 @@ import { FloatingBubble, PortraitBubble } from "@/components/portrait-bubble";
 import { ProjectDetails, type BubbleOrigin } from "@/components/project-details";
 import { localizeProject, projects as sourceProjects } from "@/data/projects";
 import { useElementSize } from "@/hooks/use-element-size";
-import { getProjectOffsets } from "@/lib/orbit-layout";
+import { getProjectOffsets, getProjectSceneHeight } from "@/lib/orbit-layout";
 
 export function ProjectOrbit() {
   const { language, t } = useLanguage();
@@ -24,7 +24,10 @@ export function ProjectOrbit() {
   const central = useRef<HTMLDivElement>(null);
   const { ref: scene, width, height } = useElementSize<HTMLDivElement>();
   const reducedMotion = useReducedMotion();
-  const positions = getProjectOffsets(width, height);
+  const positions = useMemo(
+    () => getProjectOffsets(width, height, projects.length),
+    [width, height, projects.length],
+  );
 
   function close() {
     central.current?.querySelector("button")?.focus({ preventScroll: true });
@@ -36,6 +39,7 @@ export function ProjectOrbit() {
     <div
       ref={scene}
       className="project-orbit"
+      style={{ minHeight: `max(100dvh, ${getProjectSceneHeight(width, projects.length)}px)` }}
       data-open={open}
       onKeyDown={(event) => {
         if (event.key === "Escape" && open && selected === null) {
@@ -44,7 +48,7 @@ export function ProjectOrbit() {
         }
       }}
     >
-      <OrbitParticles open={open} width={width} height={height} />
+      <OrbitParticles open={open} width={width} height={height} projectOffsets={positions} />
       <div ref={central} className="project-orbit__center">
         <PortraitBubble expanded={open} onClick={() => (open ? close() : setOpen(true))} />
       </div>
@@ -52,7 +56,8 @@ export function ProjectOrbit() {
         <AnimatePresence>
           {open &&
             projects.map((project, index) => {
-              const position = positions[index] ?? positions[0];
+              const position = positions[index];
+              if (!position) return null;
 
               return (
                 <motion.div
@@ -76,8 +81,11 @@ export function ProjectOrbit() {
                   }}
                 >
                   <FloatingBubble
-                    image={project.images[0].src}
+                    image={project.cover?.src ?? project.images[0].src}
+                    imagePosition={project.cover?.position}
+                    imageZoom={project.cover?.zoom}
                     label={`${t.discover} ${project.title}`}
+                    projectTitle={project.title}
                     project
                     index={index}
                     selected={selected === project.id}

@@ -1,6 +1,9 @@
 export const languages = ["fr", "en", "ja"] as const;
 export type Language = (typeof languages)[number];
 
+// Add "ja" here when the Japanese content is ready; its support remains in place.
+export const enabledLanguages: readonly Language[] = ["fr", "en"];
+
 export const defaultLanguage: Language = "fr";
 
 export function isLanguage(value: string | null): value is Language {
@@ -8,8 +11,8 @@ export function isLanguage(value: string | null): value is Language {
 }
 
 export function getNextLanguage(language: Language): Language {
-  const currentIndex = languages.indexOf(language);
-  return languages[(currentIndex + 1) % languages.length] ?? defaultLanguage;
+  const currentIndex = enabledLanguages.indexOf(language);
+  return enabledLanguages[(currentIndex + 1) % enabledLanguages.length] ?? defaultLanguage;
 }
 
 export const languageNames: Record<Language, string> = {
@@ -22,7 +25,6 @@ type Messages = {
   showProjects: string;
   hideProjects: string;
   projects: string;
-  project: string;
   discover: string;
   closeProject: string;
   gallery: string;
@@ -34,7 +36,7 @@ type Messages = {
   portrait: string;
   showImage: (index: number) => string;
   imagePosition: (index: number, total: number) => string;
-  imageAlt: (index: number, projectId: number) => string;
+  imageAlt: (index: number, projectTitle: string) => string;
   switchLanguage: (languageName: string) => string;
 };
 
@@ -43,7 +45,6 @@ export const messages: Record<Language, Messages> = {
     showProjects: "Afficher les projets",
     hideProjects: "Masquer les projets",
     projects: "Projets",
-    project: "Projet",
     discover: "Découvrir",
     closeProject: "Fermer le projet",
     gallery: "Images du projet",
@@ -52,7 +53,7 @@ export const messages: Record<Language, Messages> = {
     showImage: (n: number) => `Afficher l’image ${n}`,
     imagePosition: (n: number, total: number) =>
       `Image ${n} sur ${total}. Afficher l’image suivante`,
-    imageAlt: (n: number, id: number) => `Visuel provisoire ${n} du projet ${id}`,
+    imageAlt: (n: number, title: string) => `Image ${n} — ${title}`,
     code: "Voir le code",
     demo: "Voir la démo",
     newTab: "nouvel onglet",
@@ -63,7 +64,6 @@ export const messages: Record<Language, Messages> = {
     showProjects: "Show projects",
     hideProjects: "Hide projects",
     projects: "Projects",
-    project: "Project",
     discover: "Explore",
     closeProject: "Close project",
     gallery: "Project images",
@@ -71,7 +71,7 @@ export const messages: Record<Language, Messages> = {
     previousImage: "Previous image",
     showImage: (n: number) => `Show image ${n}`,
     imagePosition: (n: number, total: number) => `Image ${n} of ${total}. Show next image`,
-    imageAlt: (n: number, id: number) => `Placeholder image ${n} for project ${id}`,
+    imageAlt: (n: number, title: string) => `Image ${n} — ${title}`,
     code: "View code",
     demo: "Watch demo",
     newTab: "new tab",
@@ -82,7 +82,6 @@ export const messages: Record<Language, Messages> = {
     showProjects: "プロジェクトを表示",
     hideProjects: "プロジェクトを閉じる",
     projects: "プロジェクト",
-    project: "プロジェクト",
     discover: "詳しく見る：",
     closeProject: "プロジェクトを閉じる",
     gallery: "プロジェクトの画像",
@@ -90,7 +89,7 @@ export const messages: Record<Language, Messages> = {
     previousImage: "前の画像",
     showImage: (n: number) => `画像${n}を表示`,
     imagePosition: (n: number, total: number) => `全${total}枚中${n}枚目。次の画像を表示`,
-    imageAlt: (n: number, id: number) => `プロジェクト${id}の仮画像${n}`,
+    imageAlt: (n: number, title: string) => `${title}の画像${n}`,
     code: "コードを見る",
     demo: "デモを見る",
     newTab: "新しいタブ",

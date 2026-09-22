@@ -29,6 +29,12 @@ export function ProjectGallery({ images }: ProjectGalleryProps) {
       <button
         type="button"
         className="project-gallery__image"
+        style={{
+          aspectRatio:
+            typeof activeImage.src === "string"
+              ? "16 / 10"
+              : `${activeImage.src.width} / ${activeImage.src.height}`,
+        }}
         aria-label={
           hasMultipleImages ? t.imagePosition(activeIndex + 1, images.length) : activeImage.alt
         }
@@ -64,7 +70,7 @@ export function ProjectGallery({ images }: ProjectGalleryProps) {
               src={activeImage.src}
               alt={activeImage.alt}
               fill
-              sizes="(max-width: 700px) 72vw, 340px"
+              sizes="(max-width: 700px) 85vw, 340px"
               className="project-gallery__asset"
             />
           </motion.span>

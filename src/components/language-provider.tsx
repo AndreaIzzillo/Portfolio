@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useSyncExternalStore, type ReactN
 
 import {
   defaultLanguage,
+  enabledLanguages,
   getNextLanguage,
   isLanguage,
   messages,
@@ -17,7 +18,11 @@ let currentLanguage = defaultLanguage;
 function readLanguage(): Language {
   try {
     const saved = localStorage.getItem(storageKey);
-    currentLanguage = isLanguage(saved) ? saved : currentLanguage;
+    currentLanguage = isLanguage(saved)
+      ? enabledLanguages.includes(saved)
+        ? saved
+        : defaultLanguage
+      : currentLanguage;
   } catch {
     // Local storage can be disabled; the in-memory preference remains usable.
   }
