@@ -3,8 +3,8 @@
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "motion/react";
 
-import { mapNonEmpty } from "@/lib/arrays";
-import { getProjectOffsets } from "@/lib/orbit-layout";
+import { createOrbitParticles } from "@/lib/orbit-particle-model";
+import type { ProjectOffset } from "@/lib/orbit-layout";
 
 const COLORS = [
   "91, 174, 160",
@@ -15,20 +15,16 @@ const COLORS = [
 ] as const;
 const TAU = Math.PI * 2;
 
-// Stable seeds keep the constellation continuous through open/close and resize.
-function noise(seed: number) {
-  const value = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
-  return value - Math.floor(value);
-}
-
 export function OrbitParticles({
   open,
   width,
   height,
+  projectOffsets,
 }: {
   open: boolean;
   width: number;
   height: number;
+  projectOffsets: readonly ProjectOffset[];
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const progress = useRef(0);
@@ -46,19 +42,11 @@ export function OrbitParticles({
     element.height = Math.round(height * ratio);
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-    const projectOffsets = getProjectOffsets(width, height);
     const portrait = element.parentElement?.querySelector<HTMLElement>(
       ".project-orbit__center .portrait-bubble",
     );
     const projectRadius = Math.min(116, width * 0.22, window.innerHeight * 0.22) / 2;
-    const count = width <= 640 ? 125 : 225;
-    const particles = Array.from({ length: count }, (_, index) => ({
-      group: index % 5,
-      seed: noise(index + 1),
-      phase: noise(index + 101) * TAU,
-      radius: 0.8 + noise(index + 201) * 1.8,
-      trail: [] as { x: number; y: number }[],
-    }));
+    const particles = createOrbitParticles(projectOffsets.length, width <= 640);
 
     let frame = 0;
     let lastTime = 0;
@@ -87,7 +75,7 @@ export function OrbitParticles({
         : height / 2;
       const coreRadius = (portraitBounds?.width ?? 170) / 2;
       // Moving the source must not displace the destinations around the projects.
-      const targets = mapNonEmpty(projectOffsets, (offset) => ({
+      const targets = projectOffsets.map((offset) => ({
         x: width / 2 + offset.x - cx,
         y: height / 2 + offset.y - cy,
       }));
@@ -95,7 +83,7 @@ export function OrbitParticles({
 
       // Hairline paths remain after the burst, with beads travelling along them.
       targets.forEach((target, group) => {
-        const length = Math.hypot(target.x, target.y);
+        const length = Math.max(1, Math.hypot(target.x, target.y));
         const bend = (group % 2 ? -1 : 1) * Math.min(75, length * 0.24);
         const nx = -target.y / length;
         const ny = target.x / length;
@@ -107,7 +95,7 @@ export function OrbitParticles({
           cx + target.x,
           cy + target.y,
         );
-        context.strokeStyle = `rgba(${COLORS[group]}, ${p * 0.18})`;
+        context.strokeStyle = `rgba(${COLORS[group % COLORS.length]}, ${p * 0.18})`;
         context.lineWidth = 0.8;
         context.stroke();
       });
@@ -121,8 +109,9 @@ export function OrbitParticles({
         context.stroke();
       }
 
-      particles.forEach((particle, index) => {
-        const target = targets[particle.group % targets.length] ?? targets[0];
+      particles.forEach((particle) => {
+        const target = targets[particle.group];
+        if (!target) return;
         const angle = particle.phase + time * (0.12 + particle.seed * 0.09);
         const orbit =
           coreRadius + 13 + particle.seed * 34 + Math.sin(time * 0.7 + particle.phase) * 6;
@@ -131,15 +120,19 @@ export function OrbitParticles({
         let endX: number;
         let endY: number;
 
-        if (index % 3 === 0) {
+        if (particle.kind === "path") {
           const travel = (particle.seed + time * 0.075) % 1;
-          const length = Math.hypot(target.x, target.y);
+          const length = Math.max(1, Math.hypot(target.x, target.y));
           const bend = (particle.group % 2 ? -1 : 1) * Math.min(75, length * 0.24);
           const curve = 2 * travel * (1 - travel) * bend;
           endX = target.x * travel - (target.y / length) * curve;
           endY = target.y * travel + (target.x / length) * curve;
         } else {
-          const halo = projectRadius + 10 + particle.seed * 20;
+          const halo =
+            projectRadius +
+            12 +
+            particle.seed * 28 +
+            Math.sin(time * (0.35 + particle.seed * 0.3) + particle.phase) * 6;
           endX = target.x + Math.cos(angle * 1.2) * halo;
           endY = target.y + Math.sin(angle * 1.2) * halo;
         }
@@ -181,7 +174,7 @@ export function OrbitParticles({
         context.fillStyle = `rgba(${color}, ${alpha})`;
         context.fill();
 
-        if (index % 13 === 0) {
+        if (particle.sparkle) {
           context.beginPath();
           context.moveTo(x - 4, y);
           context.lineTo(x + 4, y);
@@ -217,7 +210,7 @@ export function OrbitParticles({
       observer.disconnect();
       document.removeEventListener("visibilitychange", resume);
     };
-  }, [open, width, height, reducedMotion]);
+  }, [open, width, height, reducedMotion, projectOffsets]);
 
   return <canvas ref={canvas} className="orbit-particles" aria-hidden="true" />;
 }

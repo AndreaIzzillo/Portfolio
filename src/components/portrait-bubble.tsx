@@ -2,7 +2,7 @@
 
 import Image, { type StaticImageData } from "next/image";
 import { motion } from "motion/react";
-import type { CSSProperties, MouseEventHandler } from "react";
+import { useId, type CSSProperties, type MouseEventHandler } from "react";
 
 import { useLanguage } from "@/components/language-provider";
 import { useMagneticPull } from "@/hooks/use-magnetic-pull";
@@ -13,6 +13,7 @@ type BubbleProps = {
   imagePosition?: string;
   imageZoom?: number;
   label: string;
+  projectTitle?: string;
   onClick: MouseEventHandler<HTMLButtonElement>;
   project?: boolean;
   index?: number;
@@ -39,6 +40,7 @@ export function FloatingBubble({
   imagePosition,
   imageZoom = 1,
   label,
+  projectTitle,
   onClick,
   project = false,
   index = 0,
@@ -48,6 +50,8 @@ export function FloatingBubble({
 }: BubbleProps) {
   const { t } = useLanguage();
   const { anchorRef, reducedMotion, x, y } = useMagneticPull<HTMLDivElement>();
+  const titlePathId = useId();
+  const titleRepetitions = Math.max(2, Math.round(415 / (((projectTitle?.length ?? 0) + 3) * 7)));
 
   return (
     <div ref={anchorRef} className={`portrait-anchor${project ? " portrait-anchor--project" : ""}`}>
@@ -90,6 +94,23 @@ export function FloatingBubble({
             <span className="portrait-bubble__rim" aria-hidden="true" />
             <span className="portrait-bubble__reflection" aria-hidden="true" />
           </button>
+          {project && projectTitle && (
+            <svg
+              className="project-bubble-title"
+              viewBox="0 0 160 160"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <defs>
+                <path id={titlePathId} d="M14 80a66 66 0 1 1 132 0a66 66 0 1 1-132 0" />
+              </defs>
+              <text textLength="407" lengthAdjust="spacingAndGlyphs">
+                <textPath href={`#${titlePathId}`}>
+                  {Array.from({ length: titleRepetitions }, () => `${projectTitle} ·`).join(" ")}
+                </textPath>
+              </text>
+            </svg>
+          )}
         </div>
       </motion.div>
     </div>

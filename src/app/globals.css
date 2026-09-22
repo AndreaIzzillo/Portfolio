@@ -307,6 +307,42 @@ body {
   user-select: none;
 }
 
+.project-bubble-title {
+  position: absolute;
+  inset: -24px;
+  width: calc(100% + 48px);
+  height: calc(100% + 48px);
+  overflow: visible;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  fill: #486571;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  filter: drop-shadow(0 1px 3px #ffffff);
+  transition: opacity 0.3s ease;
+  animation: project-title-orbit 20s linear infinite paused;
+}
+
+.portrait-bubble:focus-visible + .project-bubble-title {
+  opacity: 1;
+  animation-play-state: running;
+}
+
+@media (hover: hover) {
+  .portrait-bubble:hover + .project-bubble-title {
+    opacity: 1;
+    animation-play-state: running;
+  }
+}
+
+@keyframes project-title-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .portrait-bubble__rim {
   position: absolute;
   inset: 0;
@@ -731,6 +767,7 @@ body {
   .dream-ribbon__shape,
   .portrait-float,
   .portrait-float::before,
+  .project-bubble-title,
   .portrait-bubble__rim {
     animation: none;
   }
