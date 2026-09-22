@@ -10,6 +10,8 @@ import portrait from "../../public/images/portrait.jpg";
 
 type BubbleProps = {
   image: StaticImageData | string;
+  imagePosition?: string;
+  imageZoom?: number;
   label: string;
   onClick: MouseEventHandler<HTMLButtonElement>;
   project?: boolean;
@@ -34,6 +36,8 @@ export function PortraitBubble({ expanded, onClick }: { expanded: boolean; onCli
 
 export function FloatingBubble({
   image,
+  imagePosition,
+  imageZoom = 1,
   label,
   onClick,
   project = false,
@@ -80,6 +84,7 @@ export function FloatingBubble({
               sizes={project ? "min(116px, 22vw, 22svh)" : "min(170px, 32vw, 32svh)"}
               preload={!project}
               className="portrait-bubble__image"
+              style={{ objectPosition: imagePosition, transform: `scale(${imageZoom})` }}
               draggable={false}
             />
             <span className="portrait-bubble__rim" aria-hidden="true" />

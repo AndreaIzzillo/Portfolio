@@ -22,7 +22,6 @@ type Messages = {
   showProjects: string;
   hideProjects: string;
   projects: string;
-  project: string;
   discover: string;
   closeProject: string;
   gallery: string;
@@ -43,7 +42,6 @@ export const messages: Record<Language, Messages> = {
     showProjects: "Afficher les projets",
     hideProjects: "Masquer les projets",
     projects: "Projets",
-    project: "Projet",
     discover: "Découvrir",
     closeProject: "Fermer le projet",
     gallery: "Images du projet",
@@ -63,7 +61,6 @@ export const messages: Record<Language, Messages> = {
     showProjects: "Show projects",
     hideProjects: "Hide projects",
     projects: "Projects",
-    project: "Project",
     discover: "Explore",
     closeProject: "Close project",
     gallery: "Project images",
@@ -82,7 +79,6 @@ export const messages: Record<Language, Messages> = {
     showProjects: "プロジェクトを表示",
     hideProjects: "プロジェクトを閉じる",
     projects: "プロジェクト",
-    project: "プロジェクト",
     discover: "詳しく見る：",
     closeProject: "プロジェクトを閉じる",
     gallery: "プロジェクトの画像",

@@ -76,7 +76,9 @@ export function ProjectOrbit() {
                   }}
                 >
                   <FloatingBubble
-                    image={project.images[0].src}
+                    image={project.cover?.src ?? project.images[0].src}
+                    imagePosition={project.cover?.position}
+                    imageZoom={project.cover?.zoom}
                     label={`${t.discover} ${project.title}`}
                     project
                     index={index}
