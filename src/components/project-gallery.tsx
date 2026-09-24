@@ -15,6 +15,7 @@ type ProjectGalleryProps = {
 export function ProjectGallery({ images }: ProjectGalleryProps) {
   const { t } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [imageRatios, setImageRatios] = useState<Record<string, number>>({});
   const reducedMotion = useReducedMotion();
   const hasMultipleImages = images.length > 1;
   const activeImage = images[activeIndex] ?? images[0];
@@ -32,7 +33,7 @@ export function ProjectGallery({ images }: ProjectGalleryProps) {
         style={{
           aspectRatio:
             typeof activeImage.src === "string"
-              ? "16 / 10"
+              ? (imageRatios[activeImage.src] ?? "16 / 10")
               : `${activeImage.src.width} / ${activeImage.src.height}`,
         }}
         aria-label={
@@ -69,9 +70,21 @@ export function ProjectGallery({ images }: ProjectGalleryProps) {
             <Image
               src={activeImage.src}
               alt={activeImage.alt}
+              // Keep the original file so animated GIFs retain every frame.
+              unoptimized
               fill
               sizes="(max-width: 700px) 85vw, 340px"
               className="project-gallery__asset"
+              onLoad={(event) => {
+                const source = activeImage.src;
+                const { naturalWidth, naturalHeight } = event.currentTarget;
+                if (typeof source !== "string" || !naturalWidth || !naturalHeight) return;
+
+                const ratio = naturalWidth / naturalHeight;
+                setImageRatios((current) =>
+                  current[source] === ratio ? current : { ...current, [source]: ratio },
+                );
+              }}
             />
           </motion.span>
         </AnimatePresence>
