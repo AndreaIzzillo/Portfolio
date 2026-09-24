@@ -8,6 +8,8 @@ import chromAuraGunner from "../../public/images/ChromAura/gunner.png";
 import chromAuraRonaldo from "../../public/images/ChromAura/ronaldo.png";
 import chromAuraZigzag from "../../public/images/ChromAura/zigzag.png";
 import doomLikeDemo from "../../public/images/DoomLike/demo.png";
+import doomLikeDemoDoom from "../../public/images/DoomLike/demo_doom.gif";
+import doomLikeDemoMc from "../../public/images/DoomLike/demo_mc.gif";
 import doomLikeDoom from "../../public/images/DoomLike/doom.png";
 import doomLikeMc from "../../public/images/DoomLike/mc.png";
 import doomLikeShining from "../../public/images/DoomLike/shining.png";
@@ -17,6 +19,9 @@ import outerGLSpace from "../../public/images/OuterGL/A_wide_and_empty_space.png
 import outerGLEclipse from "../../public/images/OuterGL/Is_this_a_solar_eclipse.png";
 import outerGLEnd from "../../public/images/OuterGL/The_end.png";
 import outerGLSystem from "../../public/images/OuterGL/The_full_system.png";
+import reprAll from "../../public/images/REPR/all.png";
+import reprDemo from "../../public/images/REPR/demo.gif";
+import reprSide from "../../public/images/REPR/side.png";
 
 type ProjectAsset = {
   src: StaticImageData | string;
@@ -88,11 +93,13 @@ export const projects: ProjectDefinition[] = [
   {
     id: 2,
     stack: ["C++17", "SFML 3", "OpenMP", "CMake"],
-    cover: { src: doomLikeDoom, position: "85% 50%" },
+    cover: { src: doomLikeMc, position: "20% 50%" },
     images: [
       { src: doomLikeDoom },
+      { src: doomLikeDemoDoom },
       { src: doomLikeDemo },
       { src: doomLikeMc },
+      { src: doomLikeDemoMc },
       { src: doomLikeShining },
     ],
     repoUrl: "https://github.com/AndreaIzzillo/DoomLike-Engine",
@@ -167,6 +174,26 @@ export const projects: ProjectDefinition[] = [
         subtitle: "GPU-accelerated motion detection",
         description:
           "Development of a GStreamer filter in C++ and CUDA to separate moving objects from the background of a video. The processing estimates the background, cleans up the motion mask and highlights detected areas in red. Performance comparison of the CPU and GPU versions.",
+      },
+    },
+  },
+  {
+    id: 5,
+    stack: ["TypeScript", "WebGL 2", "GLSL", "Vite"],
+    cover: { src: reprSide },
+    images: [{ src: reprSide }, { src: reprAll }, { src: reprDemo }],
+    translations: {
+      fr: {
+        title: "Moteur de rendu PBR",
+        subtitle: "BRDF photoréalistes et éclairage par environnement",
+        description:
+          "Réalisation d’un rendu PBR dans le cadre d’un TP, à partir d’une base de code WebGL2 fournie. Écriture de shaders intégrant la BRDF diffuse de Lambert et la BRDF spéculaire de Cook-Torrance GGX pour faire varier la rugosité et la métallicité des matériaux. Chargement et transfert des textures d’environnement vers le GPU pour l’éclairage et les réflexions précalculées, selon une approche notamment utilisée par Unreal Engine 4.",
+      },
+      en: {
+        title: "PBR Renderer",
+        subtitle: "Photorealistic BRDFs and environment lighting",
+        description:
+          "PBR rendering project created for a course assignment using a provided WebGL2 codebase. Development of shaders combining a Lambertian diffuse BRDF and a Cook-Torrance GGX specular BRDF to vary material roughness and metallicity. Loading and transferring environment textures to the GPU for lighting and precomputed reflections, following an approach also used by Unreal Engine 4.",
       },
     },
   },
