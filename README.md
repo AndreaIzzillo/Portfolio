@@ -7,6 +7,7 @@ Les projets affichés sont les entrées de `src/data/projects.ts`, dans l’ordr
 - Ajouter les images dans `public/images/<Projet>/`, puis les importer dans ce fichier.
 - Ajouter une entrée avec un `id` unique et stable, au moins une image, et les textes français dans `translations.fr`. Les traductions manquantes utilisent le français.
 - `cover` est facultatif : sans lui, la première image sert de vitrine. `position` et `zoom` permettent de régler son cadrage.
+- Renseigner `stack` avec les langages, bibliothèques et outils réellement utilisés ; cette liste est affichée sous la description dans toutes les langues.
 - Ajouter `repoUrl` et/ou `demoUrl` uniquement si le lien existe. Un lien absent masque le bouton correspondant.
 - Pour retirer un projet, supprimer son entrée sans renuméroter les autres identifiants.
 

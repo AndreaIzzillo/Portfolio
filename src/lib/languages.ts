@@ -22,6 +22,7 @@ export const languageNames: Record<Language, string> = {
 };
 
 type Messages = {
+  techStack: string;
   showProjects: string;
   hideProjects: string;
   projects: string;
@@ -42,6 +43,7 @@ type Messages = {
 
 export const messages: Record<Language, Messages> = {
   fr: {
+    techStack: "Stack technique",
     showProjects: "Afficher les projets",
     hideProjects: "Masquer les projets",
     projects: "Projets",
@@ -61,6 +63,7 @@ export const messages: Record<Language, Messages> = {
     switchLanguage: (next: string) => `Changer de langue : ${next}`,
   },
   en: {
+    techStack: "Tech stack",
     showProjects: "Show projects",
     hideProjects: "Hide projects",
     projects: "Projects",
@@ -79,6 +82,7 @@ export const messages: Record<Language, Messages> = {
     switchLanguage: (next: string) => `Switch language to ${next}`,
   },
   ja: {
+    techStack: "使用技術",
     showProjects: "プロジェクトを表示",
     hideProjects: "プロジェクトを閉じる",
     projects: "プロジェクト",

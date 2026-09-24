@@ -11,6 +11,7 @@ import doomLikeDemo from "../../public/images/DoomLike/demo.png";
 import doomLikeDoom from "../../public/images/DoomLike/doom.png";
 import doomLikeMc from "../../public/images/DoomLike/mc.png";
 import doomLikeShining from "../../public/images/DoomLike/shining.png";
+import gpgpuPeople from "../../public/images/GPGPU/people.png";
 import outerGLNewStart from "../../public/images/OuterGL/A_new_start.png";
 import outerGLSpace from "../../public/images/OuterGL/A_wide_and_empty_space.png";
 import outerGLEclipse from "../../public/images/OuterGL/Is_this_a_solar_eclipse.png";
@@ -30,6 +31,7 @@ export type Project = {
   title: string;
   subtitle: string;
   description: string;
+  stack?: readonly string[];
   images: NonEmptyArray<ProjectImage>;
   cover?: ProjectAsset & { position?: string; zoom?: number };
   repoUrl?: string;
@@ -40,6 +42,7 @@ type ProjectText = Pick<Project, "title" | "subtitle" | "description">;
 
 export type ProjectDefinition = {
   id: number;
+  stack?: Project["stack"];
   images: NonEmptyArray<ProjectAsset>;
   cover?: Project["cover"];
   repoUrl?: string;
@@ -51,6 +54,7 @@ export type ProjectDefinition = {
 export const projects: ProjectDefinition[] = [
   {
     id: 1,
+    stack: ["C++17", "OpenGL 4.3", "GLSL", "GLEW", "FreeGLUT", "GLM", "tinygltf", "CMake"],
     cover: { src: outerGLNewStart, position: "45% 50%", zoom: 1.85 },
     images: [
       { src: outerGLEclipse },
@@ -83,6 +87,7 @@ export const projects: ProjectDefinition[] = [
   },
   {
     id: 2,
+    stack: ["C++17", "SFML 3", "OpenMP", "CMake"],
     cover: { src: doomLikeDoom, position: "85% 50%" },
     images: [
       { src: doomLikeDoom },
@@ -114,6 +119,7 @@ export const projects: ProjectDefinition[] = [
   },
   {
     id: 3,
+    stack: ["Godot 4", "C#", ".NET 8", "GDScript", "MediaPipe / GDMP", "Kinect / gd-depthcam"],
     cover: { src: chromAuraRonaldo },
     images: [
       { src: chromAuraAura },
@@ -144,13 +150,34 @@ export const projects: ProjectDefinition[] = [
       },
     },
   },
+  {
+    id: 4,
+    stack: ["C++17", "CUDA", "cuRAND", "GStreamer", "CMake"],
+    cover: { src: gpgpuPeople, zoom: 1.4 },
+    images: [{ src: gpgpuPeople }],
+    translations: {
+      fr: {
+        title: "Projet GPGPU",
+        subtitle: "Détection de mouvement accélérée sur GPU",
+        description:
+          "Développement d’un filtre GStreamer en C++ et CUDA pour distinguer les objets mobiles du fond d’une vidéo. Le traitement estime le fond, nettoie le masque de mouvement et met les zones détectées en évidence en rouge. Comparaison des performances des versions CPU et GPU.",
+      },
+      en: {
+        title: "GPGPU Project",
+        subtitle: "GPU-accelerated motion detection",
+        description:
+          "Development of a GStreamer filter in C++ and CUDA to separate moving objects from the background of a video. The processing estimates the background, cleans up the motion mask and highlights detected areas in red. Performance comparison of the CPU and GPU versions.",
+      },
+    },
+  },
 ];
 
 export function localizeProject(project: ProjectDefinition, language: Language): Project {
   const translation = project.translations[language] ?? project.translations.fr;
-  const { images, id, cover, repoUrl, demoUrl } = project;
+  const { images, id, cover, repoUrl, demoUrl, stack } = project;
   return {
     id,
+    stack,
     cover,
     repoUrl,
     demoUrl,
