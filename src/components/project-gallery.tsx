@@ -77,11 +77,6 @@ export function ProjectGallery({ images }: ProjectGalleryProps) {
         </AnimatePresence>
 
         <span className="project-gallery__gloss" aria-hidden="true" />
-        {hasMultipleImages && (
-          <span className="project-gallery__hint">
-            {t.nextImage} <span aria-hidden="true">↗</span>
-          </span>
-        )}
       </button>
 
       {hasMultipleImages && (

@@ -105,6 +105,12 @@ export function ProjectDetails({
           </p>
           <div className="project-detail__divider" aria-hidden="true" />
           <p className="project-detail__description">{project.description}</p>
+          {project.stack && project.stack.length > 0 && (
+            <p className="project-detail__stack">
+              <span className="project-detail__stack-label">{t.techStack} : </span>
+              {project.stack.join(" · ")}
+            </p>
+          )}
           {(project.repoUrl || project.demoUrl) && (
             <div className="project-detail__actions">
               {project.repoUrl && (
