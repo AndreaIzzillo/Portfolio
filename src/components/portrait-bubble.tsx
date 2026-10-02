@@ -88,7 +88,12 @@ export function FloatingBubble({
               sizes={project ? "min(116px, 22vw, 22svh)" : "min(170px, 32vw, 32svh)"}
               preload={!project}
               className="portrait-bubble__image"
-              style={{ objectPosition: imagePosition, transform: `scale(${imageZoom})` }}
+              style={{
+                objectPosition: imagePosition,
+                transform: project
+                  ? `scale(${imageZoom})`
+                  : "translateY(-4%) scale(1.1)",
+              }}
               draggable={false}
             />
             <span className="portrait-bubble__rim" aria-hidden="true" />

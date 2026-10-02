@@ -303,7 +303,6 @@ body {
 
 .portrait-bubble__image {
   object-fit: cover;
-  object-position: center 70%;
   user-select: none;
 }
 
