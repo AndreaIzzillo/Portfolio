@@ -33,6 +33,13 @@ export function OrbitParticles({
   const canvas = useRef<HTMLCanvasElement>(null);
   const progress = useRef(0);
   const elapsed = useRef(0);
+  const resources = useRef<{
+    projectCount: number;
+    mobile: boolean;
+    ratio: number;
+    particles: ReturnType<typeof createOrbitParticles>;
+    sprites: ReturnType<typeof createParticleSprite>[];
+  } | null>(null);
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
@@ -43,23 +50,41 @@ export function OrbitParticles({
     if (!context) return;
 
     const ratio = canvasPixelRatio(width, height, window.devicePixelRatio);
-    element.width = Math.round(width * ratio);
-    element.height = Math.round(height * ratio);
+    const pixelWidth = Math.round(width * ratio);
+    const pixelHeight = Math.round(height * ratio);
+    if (element.width !== pixelWidth) element.width = pixelWidth;
+    if (element.height !== pixelHeight) element.height = pixelHeight;
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
 
     const portrait = element.parentElement?.querySelector<HTMLElement>(
       ".project-orbit__center .portrait-bubble",
     );
     const projectRadius = Math.min(116, width * 0.22, window.innerHeight * 0.22) / 2;
-    const particles = createOrbitParticles(projectOffsets.length, width <= 640);
-    const sprites = particles.map((particle) =>
-      createParticleSprite(
-        particle.radius,
-        COLORS[particle.group % COLORS.length]!,
-        particle.sparkle,
+    const mobile = width <= 640;
+    // A modal only pauses drawing; keep the textures and simulation ready for resuming.
+    if (
+      !resources.current ||
+      resources.current.projectCount !== projectOffsets.length ||
+      resources.current.mobile !== mobile ||
+      resources.current.ratio !== ratio
+    ) {
+      const particles = createOrbitParticles(projectOffsets.length, mobile);
+      resources.current = {
+        projectCount: projectOffsets.length,
+        mobile,
         ratio,
-      ),
-    );
+        particles,
+        sprites: particles.map((particle) =>
+          createParticleSprite(
+            particle.radius,
+            COLORS[particle.group % COLORS.length]!,
+            particle.sparkle,
+            ratio,
+          ),
+        ),
+      };
+    }
+    const { particles, sprites } = resources.current;
     const targets = projectOffsets.map(() => ({ x: 0, y: 0, bend: 0, nx: 0, ny: 0 }));
     let canvasBounds = surface.getBoundingClientRect();
     let boundsDirty = false;

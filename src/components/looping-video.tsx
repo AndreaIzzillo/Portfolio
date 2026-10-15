@@ -11,10 +11,12 @@ export function LoopingVideo({
   asset,
   alt,
   sizes,
+  active = true,
 }: {
   asset: MediaAsset;
   alt: string;
   sizes: string;
+  active?: boolean;
 }) {
   const video = useRef<HTMLVideoElement>(null);
   const visible = usePageVisible();
@@ -23,7 +25,11 @@ export function LoopingVideo({
 
   useEffect(() => {
     const element = video.current;
-    if (!element || failed || reducedMotion) return;
+    if (!element) return;
+    if (!active || failed || reducedMotion) {
+      element.pause();
+      return;
+    }
     let intersecting = false;
     const sync = () => {
       if (visible && intersecting) {
@@ -44,7 +50,7 @@ export function LoopingVideo({
       observer.disconnect();
       element.pause();
     };
-  }, [visible, reducedMotion, failed]);
+  }, [active, visible, reducedMotion, failed]);
 
   if (reducedMotion || failed || !asset.video) {
     return (

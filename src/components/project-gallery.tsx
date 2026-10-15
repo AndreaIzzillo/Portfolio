@@ -11,9 +11,10 @@ import type { NonEmptyArray } from "@/lib/arrays";
 
 type ProjectGalleryProps = {
   images: NonEmptyArray<ProjectImage>;
+  active?: boolean;
 };
 
-export function ProjectGallery({ images }: ProjectGalleryProps) {
+export function ProjectGallery({ images, active = true }: ProjectGalleryProps) {
   const { t } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
   const reducedMotion = useReducedMotion();
@@ -66,6 +67,7 @@ export function ProjectGallery({ images }: ProjectGalleryProps) {
           >
             {activeImage.src.video ? (
               <LoopingVideo
+                active={active}
                 asset={activeImage.src}
                 alt={activeImage.alt}
                 sizes="(max-width: 700px) calc(100vw - 86px), 370px"

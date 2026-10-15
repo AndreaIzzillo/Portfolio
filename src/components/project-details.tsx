@@ -22,6 +22,7 @@ export function ProjectDetails({
   const { t } = useLanguage();
   const dialog = useRef<HTMLDialogElement>(null);
   const [closing, setClosing] = useState(false);
+  const [entered, setEntered] = useState(false);
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
@@ -39,9 +40,14 @@ export function ProjectDetails({
     };
   }, []);
 
-  const collapsed = reduceMotion
-    ? { opacity: 0, x: 0, y: 0, scale: 1, borderRadius: "40px" }
-    : { opacity: 0, x: origin.x, y: origin.y, scale: 0.12, borderRadius: "50%" };
+  // A complete transform can run natively, without rebuilding x/y/scale in JS each frame.
+  const expanded = { opacity: 1, transform: "translate3d(0px, 0px, 0px) scale(1)" };
+  const collapsed = {
+    opacity: 0,
+    transform: reduceMotion
+      ? expanded.transform
+      : `translate3d(${origin.x}px, ${origin.y}px, 0px) scale(0.12)`,
+  };
 
   return (
     <dialog
@@ -65,13 +71,14 @@ export function ProjectDetails({
       <m.article
         className="project-detail"
         initial={collapsed}
-        animate={closing ? collapsed : { opacity: 1, x: 0, y: 0, scale: 1, borderRadius: "40px" }}
+        animate={closing ? collapsed : expanded}
         transition={{
           duration: reduceMotion ? 0 : closing ? 0.35 : 0.65,
           ease: [0.22, 1, 0.36, 1],
         }}
         onAnimationComplete={() => {
           if (closing) onDismiss();
+          else setEntered(true);
         }}
         inert={closing}
       >
@@ -96,7 +103,7 @@ export function ProjectDetails({
           </svg>
         </button>
 
-        <ProjectGallery images={project.images} />
+        <ProjectGallery images={project.images} active={entered && !closing} />
 
         <div className="project-detail__content">
           <h2 id="project-detail-title">{project.title}</h2>

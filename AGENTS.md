@@ -182,6 +182,10 @@ Les paramètres du canvas sont centralisés dans `src/lib/animation-settings.ts`
 de pixels. La densité de particules et leurs trajectoires restent inchangées.
 Les halos sont précalculés en petites textures, puis composités à chaque image.
 Les traînées n’allouent de points que pendant les transitions.
+Les particules et leurs textures restent en cache pendant l’ouverture d’une fiche :
+une reprise ne doit ni les recréer ni redimensionner le canvas si sa taille ne change
+pas. Le cache est renouvelé si le nombre de projets, le mode mobile ou la densité
+de rendu change.
 
 Le fond garde ses gradients, ses flous et ses mouvements ; sa silhouette ne change
 plus de `border-radius` à chaque image. Le mouvement utilise des transformations
@@ -189,6 +193,13 @@ composables. Les animations d’ambiance sont suspendues derrière une fiche ouv
 et lorsque l’onglet est masqué. L’attraction magnétique partage un seul écouteur
 et un seul traitement par image, avec les lectures de géométrie regroupées avant
 les mises à jour. Motion ne charge que les fonctionnalités utilisées (`domAnimation`).
+
+Pour les transitions des fiches, animer uniquement `opacity` et un `transform`
+complet, afin que Motion puisse utiliser les animations natives du navigateur.
+Garder le rayon des coins fixe et faire apparaître le flou d’arrière-plan de 9 px
+par un fondu d’opacité : ne pas animer `border-radius` ou `backdrop-filter` sur
+toute la durée de l’ouverture/fermeture. Les vidéos de la galerie démarrent après
+l’entrée de la fiche et se mettent en pause dès le début de sa fermeture.
 
 Pour comparer la fluidité, utiliser un export de production avec le même viewport,
 la même densité d’écran et les mêmes actions : accueil, ouverture des bulles,

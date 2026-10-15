@@ -441,6 +441,7 @@ body {
   overscroll-behavior: contain;
   padding: 84px 44px 48px;
   border: 1px solid #ffffffeb;
+  border-radius: 40px;
   background:
     radial-gradient(ellipse at 4% 0%, #d2f0e78c, transparent 52%),
     radial-gradient(ellipse at 100% 100%, #e7daf58c, transparent 50%),
@@ -720,24 +721,20 @@ body {
 
 @keyframes project-backdrop-in {
   from {
-    background: #dce8ed00;
-    backdrop-filter: blur(0);
+    opacity: 0;
   }
 
   to {
-    background: #dce8ed75;
-    backdrop-filter: blur(9px);
+    opacity: 1;
   }
 }
 @keyframes project-backdrop-out {
   from {
-    background: #dce8ed75;
-    backdrop-filter: blur(9px);
+    opacity: 1;
   }
 
   to {
-    background: #dce8ed00;
-    backdrop-filter: blur(0);
+    opacity: 0;
   }
 }
 
