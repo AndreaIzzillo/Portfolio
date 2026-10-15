@@ -113,6 +113,12 @@ Le workflow `.github/workflows/deploy-pages.yml` publie `out/` sur un push vers
 `PAGES_BASE_PATH` provient de `actions/configure-pages` ; `next.config.ts` le
 transmet aussi au client via `NEXT_PUBLIC_BASE_PATH` pour les médias.
 
+Ne pas fournir `static_site_generator: next` à `actions/configure-pages@v5` :
+cette action ne détecte pas `next.config.ts` et génère un `next.config.js`
+concurrent, qui fait notamment échouer le formatage en CI. Garder la configuration
+Next.js dans le fichier TypeScript versionné ; l’action sert uniquement à récupérer
+les métadonnées Pages, dont `base_path`.
+
 Un incident précédent venait d’un build conservant `/Portfolio/` après le passage
 au domaine personnalisé. Le chemin est fixé au build : après un changement de
 domaine, reconstruire avec le chemin approprié, sans coder `/Portfolio/` en dur
