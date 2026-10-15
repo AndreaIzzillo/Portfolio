@@ -1,13 +1,14 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useMemo, useRef, useState } from "react";
+import { AnimatePresence, m, useReducedMotion } from "motion/react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
 import { OrbitParticles } from "@/components/orbit-particles";
 import { FloatingBubble, PortraitBubble } from "@/components/portrait-bubble";
 import { ProjectDetails, type BubbleOrigin } from "@/components/project-details";
 import { localizeProject, projects as sourceProjects } from "@/data/projects";
+import { usePageVisible } from "@/hooks/use-page-visible";
 import { useElementSize } from "@/hooks/use-element-size";
 import { getProjectOffsets, getProjectSceneHeight } from "@/lib/orbit-layout";
 
@@ -20,6 +21,14 @@ export function ProjectOrbit() {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
   const [origin, setOrigin] = useState<BubbleOrigin>({ x: 0, y: 0 });
+  const pageVisible = usePageVisible();
+  const ambientActive = pageVisible && selected === null;
+  useEffect(() => {
+    document.documentElement.dataset.ambientPaused = String(!ambientActive);
+    return () => {
+      delete document.documentElement.dataset.ambientPaused;
+    };
+  }, [ambientActive]);
   const activeProject = projects.find((project) => project.id === selected);
   const central = useRef<HTMLDivElement>(null);
   const { ref: scene, width, height } = useElementSize<HTMLDivElement>();
@@ -48,9 +57,19 @@ export function ProjectOrbit() {
         }
       }}
     >
-      <OrbitParticles open={open} width={width} height={height} projectOffsets={positions} />
+      <OrbitParticles
+        active={ambientActive}
+        open={open}
+        width={width}
+        height={height}
+        projectOffsets={positions}
+      />
       <div ref={central} className="project-orbit__center">
-        <PortraitBubble expanded={open} onClick={() => (open ? close() : setOpen(true))} />
+        <PortraitBubble
+          active={ambientActive}
+          expanded={open}
+          onClick={() => (open ? close() : setOpen(true))}
+        />
       </div>
       <div id="project-bubbles" role="group" aria-label={t.projects} inert={!open}>
         <AnimatePresence>
@@ -60,7 +79,7 @@ export function ProjectOrbit() {
               if (!position) return null;
 
               return (
-                <motion.div
+                <m.div
                   key={project.id}
                   className="project-orbit__slot"
                   initial={reducedMotion ? false : { opacity: 0, scale: 0.24, x: 0, y: 0 }}
@@ -81,6 +100,7 @@ export function ProjectOrbit() {
                   }}
                 >
                   <FloatingBubble
+                    active={ambientActive}
                     image={project.cover?.src ?? project.images[0].src}
                     imagePosition={project.cover?.position}
                     imageZoom={project.cover?.zoom}
@@ -99,7 +119,7 @@ export function ProjectOrbit() {
                       setSelected(project.id);
                     }}
                   />
-                </motion.div>
+                </m.div>
               );
             })}
         </AnimatePresence>

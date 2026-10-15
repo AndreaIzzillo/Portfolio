@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import { DreamBackground } from "@/components/dream-background";
+import { MotionProvider } from "@/components/motion-provider";
 import { LanguageProvider } from "@/components/language-provider";
 
 import "./globals.css";
@@ -17,9 +18,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="fr">
       <body>
         <DreamBackground />
-        <LanguageProvider>
-          <div className="site-content">{children}</div>
-        </LanguageProvider>
+        <MotionProvider>
+          <LanguageProvider>
+            <div className="site-content">{children}</div>
+          </LanguageProvider>
+        </MotionProvider>
       </body>
     </html>
   );

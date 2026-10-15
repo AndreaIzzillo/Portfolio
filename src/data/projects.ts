@@ -1,30 +1,30 @@
-import type { StaticImageData } from "next/image";
+import { getMedia, type MediaAsset } from "@/lib/media";
 
 import { mapNonEmpty, type NonEmptyArray } from "@/lib/arrays";
 import { messages, type Language } from "@/lib/languages";
-import chromAuraAura from "../../public/images/ChromAura/aura.png";
-import chromAuraColorful from "../../public/images/ChromAura/colorful.png";
-import chromAuraGunner from "../../public/images/ChromAura/gunner.png";
-import chromAuraRonaldo from "../../public/images/ChromAura/ronaldo.png";
-import chromAuraZigzag from "../../public/images/ChromAura/zigzag.png";
-import doomLikeDemo from "../../public/images/DoomLike/demo.png";
-import doomLikeDemoDoom from "../../public/images/DoomLike/demo_doom.gif";
-import doomLikeDemoMc from "../../public/images/DoomLike/demo_mc.gif";
-import doomLikeDoom from "../../public/images/DoomLike/doom.png";
-import doomLikeMc from "../../public/images/DoomLike/mc.png";
-import doomLikeShining from "../../public/images/DoomLike/shining.png";
-import gpgpuPeople from "../../public/images/GPGPU/people.png";
-import outerGLNewStart from "../../public/images/OuterGL/A_new_start.png";
-import outerGLSpace from "../../public/images/OuterGL/A_wide_and_empty_space.png";
-import outerGLEclipse from "../../public/images/OuterGL/Is_this_a_solar_eclipse.png";
-import outerGLEnd from "../../public/images/OuterGL/The_end.png";
-import outerGLSystem from "../../public/images/OuterGL/The_full_system.png";
-import reprAll from "../../public/images/REPR/all.png";
-import reprDemo from "../../public/images/REPR/demo.gif";
-import reprSide from "../../public/images/REPR/side.png";
+const chromAuraAura = getMedia("ChromAura/aura.png");
+const chromAuraColorful = getMedia("ChromAura/colorful.png");
+const chromAuraGunner = getMedia("ChromAura/gunner.png");
+const chromAuraRonaldo = getMedia("ChromAura/ronaldo.png");
+const chromAuraZigzag = getMedia("ChromAura/zigzag.png");
+const doomLikeDemo = getMedia("DoomLike/demo.png");
+const doomLikeDemoDoom = getMedia("DoomLike/demo_doom.gif");
+const doomLikeDemoMc = getMedia("DoomLike/demo_mc.gif");
+const doomLikeDoom = getMedia("DoomLike/doom.png");
+const doomLikeMc = getMedia("DoomLike/mc.png");
+const doomLikeShining = getMedia("DoomLike/shining.png");
+const gpgpuPeople = getMedia("GPGPU/people.png");
+const outerGLNewStart = getMedia("OuterGL/A_new_start.png");
+const outerGLSpace = getMedia("OuterGL/A_wide_and_empty_space.png");
+const outerGLEclipse = getMedia("OuterGL/Is_this_a_solar_eclipse.png");
+const outerGLEnd = getMedia("OuterGL/The_end.png");
+const outerGLSystem = getMedia("OuterGL/The_full_system.png");
+const reprAll = getMedia("REPR/all.png");
+const reprDemo = getMedia("REPR/demo.gif");
+const reprSide = getMedia("REPR/side.png");
 
 type ProjectAsset = {
-  src: StaticImageData | string;
+  src: MediaAsset;
 };
 
 export type ProjectImage = ProjectAsset & {

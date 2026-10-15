@@ -12,3 +12,8 @@ npm-debug.log*
 !.env.example
 /.vercel/
 /.sites-runtime/
+
+# Rebuilt from assets/images before dev/build/checks.
+/public/media/
+/src/data/media.generated.json
+/src/data/media.generated.json.tmp

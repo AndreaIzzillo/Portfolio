@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "motion/react";
 
+import { animationSettings, canvasPixelRatio } from "@/lib/animation-settings";
+import { createParticleSprite } from "@/lib/particle-sprite";
 import { createOrbitParticles } from "@/lib/orbit-particle-model";
 import type { ProjectOffset } from "@/lib/orbit-layout";
 
@@ -17,27 +19,30 @@ const TAU = Math.PI * 2;
 
 export function OrbitParticles({
   open,
+  active,
   width,
   height,
   projectOffsets,
 }: {
   open: boolean;
+  active: boolean;
   width: number;
   height: number;
   projectOffsets: readonly ProjectOffset[];
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const progress = useRef(0);
+  const elapsed = useRef(0);
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     const element = canvas.current;
-    if (!element || !width || !height) return;
+    if (!element || !width || !height || !active) return;
     const surface = element;
     const context = element.getContext("2d");
     if (!context) return;
 
-    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    const ratio = canvasPixelRatio(width, height, window.devicePixelRatio);
     element.width = Math.round(width * ratio);
     element.height = Math.round(height * ratio);
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
@@ -47,6 +52,22 @@ export function OrbitParticles({
     );
     const projectRadius = Math.min(116, width * 0.22, window.innerHeight * 0.22) / 2;
     const particles = createOrbitParticles(projectOffsets.length, width <= 640);
+    const sprites = particles.map((particle) =>
+      createParticleSprite(
+        particle.radius,
+        COLORS[particle.group % COLORS.length]!,
+        particle.sparkle,
+        ratio,
+      ),
+    );
+    const targets = projectOffsets.map(() => ({ x: 0, y: 0, bend: 0, nx: 0, ny: 0 }));
+    let canvasBounds = surface.getBoundingClientRect();
+    let boundsDirty = false;
+    const markBoundsDirty = () => {
+      boundsDirty = true;
+    };
+    window.addEventListener("scroll", markBoundsDirty, { passive: true, capture: true });
+    window.addEventListener("resize", markBoundsDirty, { passive: true });
 
     let frame = 0;
     let lastTime = 0;
@@ -54,9 +75,14 @@ export function OrbitParticles({
 
     function draw(now: number) {
       if (!context) return;
+      if (lastTime && now - lastTime < 1000 / animationSettings.particleFps - 1) {
+        frame = requestAnimationFrame(draw);
+        return;
+      }
       const dt = lastTime ? Math.min((now - lastTime) / 1000, 0.05) : 0;
       lastTime = now;
-      const time = reducedMotion ? 0 : now / 1000;
+      elapsed.current += dt;
+      const time = reducedMotion ? 0 : elapsed.current;
       const targetProgress = open ? 1 : 0;
       progress.current = reducedMotion
         ? targetProgress
@@ -65,7 +91,10 @@ export function OrbitParticles({
       const burst = Math.sin(p * Math.PI);
       // Read the rendered circle, including float, magnetic pull and hover scale.
       // Convert viewport coordinates to canvas coordinates (also when scrolled).
-      const canvasBounds = surface.getBoundingClientRect();
+      if (boundsDirty) {
+        canvasBounds = surface.getBoundingClientRect();
+        boundsDirty = false;
+      }
       const portraitBounds = portrait?.getBoundingClientRect();
       const cx = portraitBounds
         ? portraitBounds.left + portraitBounds.width / 2 - canvasBounds.left
@@ -75,18 +104,20 @@ export function OrbitParticles({
         : height / 2;
       const coreRadius = (portraitBounds?.width ?? 170) / 2;
       // Moving the source must not displace the destinations around the projects.
-      const targets = projectOffsets.map((offset) => ({
-        x: width / 2 + offset.x - cx,
-        y: height / 2 + offset.y - cy,
-      }));
+      projectOffsets.forEach((offset, group) => {
+        const target = targets[group]!;
+        target.x = width / 2 + offset.x - cx;
+        target.y = height / 2 + offset.y - cy;
+        const length = Math.max(1, Math.hypot(target.x, target.y));
+        target.bend = (group % 2 ? -1 : 1) * Math.min(75, length * 0.24);
+        target.nx = -target.y / length;
+        target.ny = target.x / length;
+      });
       context.clearRect(0, 0, width, height);
 
       // Hairline paths remain after the burst, with beads travelling along them.
       targets.forEach((target, group) => {
-        const length = Math.max(1, Math.hypot(target.x, target.y));
-        const bend = (group % 2 ? -1 : 1) * Math.min(75, length * 0.24);
-        const nx = -target.y / length;
-        const ny = target.x / length;
+        const { bend, nx, ny } = target;
         context.beginPath();
         context.moveTo(cx, cy);
         context.quadraticCurveTo(
@@ -109,7 +140,7 @@ export function OrbitParticles({
         context.stroke();
       }
 
-      particles.forEach((particle) => {
+      particles.forEach((particle, index) => {
         const target = targets[particle.group];
         if (!target) return;
         const angle = particle.phase + time * (0.12 + particle.seed * 0.09);
@@ -122,11 +153,9 @@ export function OrbitParticles({
 
         if (particle.kind === "path") {
           const travel = (particle.seed + time * 0.075) % 1;
-          const length = Math.max(1, Math.hypot(target.x, target.y));
-          const bend = (particle.group % 2 ? -1 : 1) * Math.min(75, length * 0.24);
-          const curve = 2 * travel * (1 - travel) * bend;
-          endX = target.x * travel - (target.y / length) * curve;
-          endY = target.y * travel + (target.x / length) * curve;
+          const curve = 2 * travel * (1 - travel) * target.bend;
+          endX = target.x * travel + target.nx * curve;
+          endY = target.y * travel + target.ny * curve;
         } else {
           const halo =
             projectRadius +
@@ -156,33 +185,26 @@ export function OrbitParticles({
           context.lineWidth = particle.radius * 0.65;
           context.stroke();
         }
-        particle.trail.push({ x, y });
-        if (particle.trail.length > 5) particle.trail.shift();
+        if (burst > 0.08 && !reducedMotion) {
+          const point = particle.trail.length >= 5 ? particle.trail.shift()! : { x, y };
+          point.x = x;
+          point.y = y;
+          particle.trail.push(point);
+        } else if (particle.trail.length) {
+          particle.trail.length = 0;
+        }
 
-        const glow = context.createRadialGradient(x, y, 0, x, y, particle.radius * 4);
-        glow.addColorStop(0, `rgba(${color}, ${alpha * 0.32})`);
-        glow.addColorStop(1, `rgba(${color}, 0)`);
-        context.fillStyle = glow;
-        context.fillRect(
-          x - particle.radius * 4,
-          y - particle.radius * 4,
-          particle.radius * 8,
-          particle.radius * 8,
-        );
-        context.beginPath();
-        context.arc(x, y, particle.radius, 0, TAU);
-        context.fillStyle = `rgba(${color}, ${alpha})`;
-        context.fill();
-
-        if (particle.sparkle) {
-          context.beginPath();
-          context.moveTo(x - 4, y);
-          context.lineTo(x + 4, y);
-          context.moveTo(x, y - 4);
-          context.lineTo(x, y + 4);
-          context.strokeStyle = `rgba(${color}, ${alpha * 0.55})`;
-          context.lineWidth = 0.6;
-          context.stroke();
+        const sprite = sprites[index];
+        if (sprite) {
+          context.globalAlpha = alpha;
+          context.drawImage(
+            sprite.canvas,
+            x - sprite.size / 2,
+            y - sprite.size / 2,
+            sprite.size,
+            sprite.size,
+          );
+          context.globalAlpha = 1;
         }
       });
 
@@ -208,9 +230,11 @@ export function OrbitParticles({
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
+      window.removeEventListener("scroll", markBoundsDirty, true);
+      window.removeEventListener("resize", markBoundsDirty);
       document.removeEventListener("visibilitychange", resume);
     };
-  }, [open, width, height, reducedMotion, projectOffsets]);
+  }, [open, active, width, height, reducedMotion, projectOffsets]);
 
   return <canvas ref={canvas} className="orbit-particles" aria-hidden="true" />;
 }

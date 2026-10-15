@@ -64,6 +64,8 @@ body {
   opacity: 0.85;
   animation: ribbon-morph var(--morph-duration, 27s) ease-in-out infinite alternate;
   animation-delay: calc(var(--ribbon-index) * -7s - 12s);
+  /* Rasterize the soft shape once; animate only its composited transform. */
+  will-change: transform;
 }
 
 .dream-ribbon--mint {
@@ -118,11 +120,9 @@ body {
 
 @keyframes ribbon-morph {
   from {
-    border-radius: 36% 64% 58% 42% / 56% 35% 65% 44%;
     transform: scale(1.04, 0.85) skewX(-12deg);
   }
   to {
-    border-radius: 64% 36% 33% 67% / 38% 68% 32% 62%;
     transform: scale(0.91, 1.2) skewX(12deg);
   }
 }
@@ -302,6 +302,10 @@ body {
 }
 
 .portrait-bubble__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   user-select: none;
 }
@@ -577,6 +581,10 @@ body {
 }
 
 .project-gallery__asset {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
@@ -761,5 +769,24 @@ body {
   .project-bubble-title,
   .portrait-bubble__rim {
     animation: none;
+  }
+}
+
+/* Pause ambient layers without resetting their animation phase. */
+html[data-ambient-paused="true"]
+  :is(
+    .dream-ribbon,
+    .dream-ribbon__shape,
+    .portrait-float,
+    .project-bubble-title,
+    .portrait-bubble__rim
+  ),
+html[data-ambient-paused="true"] .portrait-float::before {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dream-ribbon__shape {
+    will-change: auto;
   }
 }

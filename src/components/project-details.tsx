@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
@@ -62,7 +62,7 @@ export function ProjectDetails({
         if (event.target === event.currentTarget) setClosing(true);
       }}
     >
-      <motion.article
+      <m.article
         className="project-detail"
         initial={collapsed}
         animate={closing ? collapsed : { opacity: 1, x: 0, y: 0, scale: 1, borderRadius: "40px" }}
@@ -147,7 +147,7 @@ export function ProjectDetails({
             </div>
           )}
         </div>
-      </motion.article>
+      </m.article>
     </dialog>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 
-import Image from "next/image";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { ResponsiveImage } from "@/components/responsive-image";
+import { LoopingVideo } from "@/components/looping-video";
+import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import { useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
@@ -15,7 +16,6 @@ type ProjectGalleryProps = {
 export function ProjectGallery({ images }: ProjectGalleryProps) {
   const { t } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [imageRatios, setImageRatios] = useState<Record<string, number>>({});
   const reducedMotion = useReducedMotion();
   const hasMultipleImages = images.length > 1;
   const activeImage = images[activeIndex] ?? images[0];
@@ -31,10 +31,7 @@ export function ProjectGallery({ images }: ProjectGalleryProps) {
         type="button"
         className="project-gallery__image"
         style={{
-          aspectRatio:
-            typeof activeImage.src === "string"
-              ? (imageRatios[activeImage.src] ?? "16 / 10")
-              : `${activeImage.src.width} / ${activeImage.src.height}`,
+          aspectRatio: `${activeImage.src.width} / ${activeImage.src.height}`,
         }}
         aria-label={
           hasMultipleImages ? t.imagePosition(activeIndex + 1, images.length) : activeImage.alt
@@ -51,7 +48,7 @@ export function ProjectGallery({ images }: ProjectGalleryProps) {
         }}
       >
         <AnimatePresence initial={false} mode="wait">
-          <motion.span
+          <m.span
             key={activeIndex}
             className="project-gallery__frame"
             initial={{
@@ -67,26 +64,21 @@ export function ProjectGallery({ images }: ProjectGalleryProps) {
             }}
             transition={{ duration: reducedMotion ? 0 : 0.22 }}
           >
-            <Image
-              src={activeImage.src}
-              alt={activeImage.alt}
-              // Keep the original file so animated GIFs retain every frame.
-              unoptimized
-              fill
-              sizes="(max-width: 700px) 85vw, 340px"
-              className="project-gallery__asset"
-              onLoad={(event) => {
-                const source = activeImage.src;
-                const { naturalWidth, naturalHeight } = event.currentTarget;
-                if (typeof source !== "string" || !naturalWidth || !naturalHeight) return;
-
-                const ratio = naturalWidth / naturalHeight;
-                setImageRatios((current) =>
-                  current[source] === ratio ? current : { ...current, [source]: ratio },
-                );
-              }}
-            />
-          </motion.span>
+            {activeImage.src.video ? (
+              <LoopingVideo
+                asset={activeImage.src}
+                alt={activeImage.alt}
+                sizes="(max-width: 700px) calc(100vw - 86px), 370px"
+              />
+            ) : (
+              <ResponsiveImage
+                asset={activeImage.src}
+                alt={activeImage.alt}
+                sizes="(max-width: 700px) calc(100vw - 86px), 370px"
+                className="project-gallery__asset"
+              />
+            )}
+          </m.span>
         </AnimatePresence>
 
         <span className="project-gallery__gloss" aria-hidden="true" />
