@@ -190,7 +190,10 @@ de rendu change.
 Le fond garde ses gradients, ses flous et ses mouvements ; sa silhouette ne change
 plus de `border-radius` à chaque image. Le mouvement utilise des transformations
 composables. Les animations d’ambiance sont suspendues derrière une fiche ouverte
-et lorsque l’onglet est masqué. L’attraction magnétique partage un seul écouteur
+et lorsque l’onglet est masqué. Elles reprennent dès la demande de fermeture
+(croix, Échap ou clic extérieur), pendant que la fiche se referme, si l’onglet
+est visible. L’état de fermeture est partagé dans `ProjectOrbit` pour synchroniser
+la fiche, les particules et le fond. L’attraction magnétique partage un seul écouteur
 et un seul traitement par image, avec les lectures de géométrie regroupées avant
 les mises à jour. Motion ne charge que les fonctionnalités utilisées (`domAnimation`).
 

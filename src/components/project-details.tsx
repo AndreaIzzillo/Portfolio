@@ -13,15 +13,18 @@ export type BubbleOrigin = { x: number; y: number };
 export function ProjectDetails({
   project,
   origin,
+  closing,
+  onRequestClose,
   onDismiss,
 }: {
   project: Project;
   origin: BubbleOrigin;
+  closing: boolean;
+  onRequestClose: () => void;
   onDismiss: () => void;
 }) {
   const { t } = useLanguage();
   const dialog = useRef<HTMLDialogElement>(null);
-  const [closing, setClosing] = useState(false);
   const [entered, setEntered] = useState(false);
   const reduceMotion = useReducedMotion();
 
@@ -59,13 +62,13 @@ export function ProjectDetails({
       data-closing={closing}
       onCancel={(event) => {
         event.preventDefault();
-        setClosing(true);
+        onRequestClose();
       }}
       onKeyDown={(event) => {
         if (event.key === "Escape") event.stopPropagation();
       }}
       onClick={(event) => {
-        if (event.target === event.currentTarget) setClosing(true);
+        if (event.target === event.currentTarget) onRequestClose();
       }}
     >
       <m.article
@@ -87,7 +90,7 @@ export function ProjectDetails({
           type="button"
           className="glass-control project-detail__close"
           aria-label={t.closeProject}
-          onClick={() => setClosing(true)}
+          onClick={onRequestClose}
           autoFocus
         >
           <svg

@@ -20,9 +20,10 @@ export function ProjectOrbit() {
   );
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
+  const [detailsClosing, setDetailsClosing] = useState(false);
   const [origin, setOrigin] = useState<BubbleOrigin>({ x: 0, y: 0 });
   const pageVisible = usePageVisible();
-  const ambientActive = pageVisible && selected === null;
+  const ambientActive = pageVisible && (selected === null || detailsClosing);
   useEffect(() => {
     document.documentElement.dataset.ambientPaused = String(!ambientActive);
     return () => {
@@ -116,6 +117,7 @@ export function ProjectOrbit() {
                         x: rect.left + rect.width / 2 - window.innerWidth / 2,
                         y: rect.top + rect.height / 2 - window.innerHeight / 2,
                       });
+                      setDetailsClosing(false);
                       setSelected(project.id);
                     }}
                   />
@@ -129,6 +131,8 @@ export function ProjectOrbit() {
           key={activeProject.id}
           project={activeProject}
           origin={origin}
+          closing={detailsClosing}
+          onRequestClose={() => setDetailsClosing(true)}
           onDismiss={() => setSelected(null)}
         />
       )}
