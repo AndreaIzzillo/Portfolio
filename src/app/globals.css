@@ -348,7 +348,7 @@ body {
 
 .portrait-bubble__rim {
   position: absolute;
-  inset: 0;
+  inset: -2px;
   border-radius: inherit;
   pointer-events: none;
   background: conic-gradient(from 30deg, #b9e7d5, #b6dff4, #d6c9ed, #f2d9c8, #b9e7d5);
@@ -357,7 +357,7 @@ body {
     transparent 58%,
     #00000030 73%,
     #000000ad 89%,
-    #000 100%
+    #000 calc(100% - 2px)
   );
   animation: portrait-iridescence 32s linear infinite;
 }
