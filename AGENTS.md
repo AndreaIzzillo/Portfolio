@@ -72,6 +72,9 @@ Ajouter une entrée à `projects` dans `src/data/projects.ts` avec un identifian
 unique et stable, au moins un média, une traduction française et sa version
 anglaise. Le placement et les particules prennent automatiquement en compte la
 liste. La couverture peut être différente du premier média de la galerie.
+Le champ `categories` contient une ou plusieurs valeurs `graphics`, `processing`,
+`gpu`, indépendantes de la langue. Elles pilotent les filtres Synthèse, Traitement
+et GPU ; ne pas déduire les catégories automatiquement depuis les stacks.
 
 Les descriptions reprennent le style d’Andrea : courtes, concrètes, semi-formelles,
 avec les techniques réellement utilisées et sans surévaluer sa contribution.
@@ -210,10 +213,11 @@ sous-chemin d’hébergement, tandis que les URL externes restent inchangées.
 ## CV et ressources du portfolio
 
 La colonne de boutons en haut à gauche est définie dans `ProjectOrbit` et reste
-verticale lors de l’ajout de ressources. Les boutons CV puis LinkedIn affichent
+verticale lors de l’ajout de ressources. Les boutons CV, LinkedIn puis GitHub affichent
 uniquement leurs icônes, avec des libellés accessibles et des infobulles.
 LinkedIn ouvre le profil `https://www.linkedin.com/in/andreaizzillo/` dans un
-nouvel onglet. Le bouton CV ouvre `CvDetails` ;
+nouvel onglet. GitHub ouvre `https://github.com/AndreaIzzillo` dans un nouvel onglet.
+Le moteur de placement réserve l’espace de ces trois boutons. Le bouton CV ouvre `CvDetails` ;
 `BubbleDialog` mutualise avec les fiches projet les transitions, le focus,
 le défilement et la fermeture au clavier ou au clic extérieur.
 
@@ -245,7 +249,7 @@ viewport. L’ovale reste central : sa largeur cible représente 62 % de l’éc
 avec un plafond de 1 280 px et une réduction supplémentaire si les marges des
 bulles l’exigent. Deux bandes libres de 80 à 144 px en haut et en bas sont
 réservées aux futures commandes et aux filtres. Ces paramètres sont centralisés
-en tête du module ; les filtres eux-mêmes ne sont pas encore implémentés.
+en tête du module.
 Les bulles s’y répartissent selon la longueur d’arc disponible, avec
 de petites variations déterministes. Ne pas réintroduire la grille à partir
 de six projets ou un espacement par angles égaux qui tasse les bulles aux
@@ -284,6 +288,18 @@ s’exécute pas à chaque image. Les particules utilisent les mêmes destinatio
 Les tests `tests/orbit-layout.test.mjs` couvrent les limites, les collisions,
 l’équilibre, l’ellipse, l’espacement curviligne et la stabilité du placement.
 
+`ProjectFilters` affiche une barre de verre pastel fixe en bas du viewport quand
+les projets sont ouverts, masquée pendant une fiche projet ou le CV. Les quatre
+choix (Tout, Synthèse, Traitement, GPU) forment un groupe radio accessible, avec
+navigation par flèches, Début et Fin. Un curseur se déplace par transformation CSS
+et respecte les animations réduites. Le choix est conservé jusqu’au rechargement.
+`filterProjects` dans `src/lib/project-filters.ts` conserve l’ordre des données et
+autorise plusieurs catégories par projet. La même liste filtrée pilote les bulles,
+le placement et les destinations visibles des particules. Les clés restent les
+identifiants des projets.
+Lors d’un filtrage, la hauteur précédente est conservée jusqu’à la sortie des
+bulles retirées pour éviter leur découpage, puis la scène se réadapte.
+
 ## Budget d’animation
 
 Les paramètres du canvas sont centralisés dans `src/lib/animation-settings.ts` :
@@ -293,8 +309,19 @@ Les halos sont précalculés en petites textures, puis composités à chaque ima
 Les traînées n’allouent de points que pendant les transitions.
 Les particules et leurs textures restent en cache pendant l’ouverture d’une fiche :
 une reprise ne doit ni les recréer ni redimensionner le canvas si sa taille ne change
-pas. Le cache est renouvelé si le nombre de projets, le mode mobile ou la densité
+pas. Le cache est renouvelé si le nombre total de projets, le mode mobile ou la densité
 de rendu change.
+
+Le filtrage conserve le pool de particules et les textures de la liste complète
+des projets, avec des groupes stables par identifiant. Les projets masqués gardent
+leur groupe avec une destination absente (`offset: null`).
+`src/lib/orbit-particle-transitions.ts` conserve les positions et opacités courantes
+et interpole chaque groupe pendant 700 ms : déplacement pour les projets conservés,
+rétraction et fondu pour les projets retirés, déploiement pour ceux qui reviennent.
+Un changement rapide reprend depuis l’état courant ; une fiche suspend les transitions
+sans les réinitialiser. Le mode de réduction des animations applique directement
+les destinations. Les groupes invisibles ne sont plus dessinés. Conserver les tests
+de régression des transitions lors des changements.
 
 Le fond garde ses gradients, ses flous et ses mouvements ; sa silhouette ne change
 plus de `border-radius` à chaque image. Le mouvement utilise des transformations

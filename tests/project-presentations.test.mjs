@@ -33,6 +33,7 @@ const manifest = JSON.parse(
 const media = await loadModule("../src/lib/media.ts", { "@/data/media.generated.json": manifest });
 const languages = await loadModule("../src/lib/languages.ts");
 const arrays = await loadModule("../src/lib/arrays.ts");
+const { projectFilters, filterProjects } = await loadModule("../src/lib/project-filters.ts");
 const { projects, localizeProject } = await loadModule("../src/data/projects.ts", {
   "@/lib/media": media,
   "@/lib/arrays": arrays,
@@ -63,6 +64,35 @@ function render(project) {
 }
 
 const ivok = projects.find((project) => project.translations.fr.title === "IVoK Signals");
+
+test("project categories are valid and survive localization in each enabled language", () => {
+  for (const project of projects) {
+    assert(project.categories.length > 0);
+    assert.equal(new Set(project.categories).size, project.categories.length);
+    for (const category of project.categories) {
+      assert(category !== "all" && projectFilters.includes(category));
+    }
+    for (const language of languages.enabledLanguages) {
+      assert.deepEqual(localizeProject(project, language).categories, project.categories);
+      for (const filter of projectFilters) {
+        assert(languages.messages[language].projectCategories[filter]);
+      }
+    }
+  }
+});
+
+test("filters keep source order and allow projects in multiple categories", () => {
+  assert.equal(filterProjects(projects, "all"), projects);
+  const processing = filterProjects(projects, "processing");
+  const gpu = filterProjects(projects, "gpu");
+  const graphics = filterProjects(projects, "graphics");
+  const byTitle = (list) => list.map((project) => project.translations.fr.title);
+  assert.deepEqual(byTitle(processing), ["ChromAura", "Projet GPGPU", "IVoK Signals"]);
+  assert.deepEqual(byTitle(gpu), ["OuterGL", "Projet GPGPU", "Moteur de rendu PBR"]);
+  assert(graphics.some((project) => project.translations.fr.title === "Raytracer CPU"));
+  assert(!gpu.some((project) => project.translations.fr.title === "Raytracer CPU"));
+  assert.deepEqual(filterProjects([], "gpu"), []);
+});
 
 test("IVoK has both translations, all supplied images and its local presentation", async () => {
   assert(ivok);

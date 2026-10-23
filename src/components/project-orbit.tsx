@@ -9,19 +9,24 @@ import { useLanguage } from "@/components/language-provider";
 import { OrbitParticles } from "@/components/orbit-particles";
 import { FloatingBubble, PortraitBubble } from "@/components/portrait-bubble";
 import { ProjectDetails } from "@/components/project-details";
+import { ProjectFilters } from "@/components/project-filters";
 import { localizeProject, projects as sourceProjects } from "@/data/projects";
 import { usePageVisible } from "@/hooks/use-page-visible";
 import { useElementSize } from "@/hooks/use-element-size";
 import { useOrbitExpansion } from "@/hooks/use-orbit-expansion";
 import { useViewportHeight } from "@/hooks/use-viewport-height";
 import { getProjectLayout } from "@/lib/orbit-layout";
+import { filterProjects, type ProjectFilter } from "@/lib/project-filters";
 
 export function ProjectOrbit() {
   const { language, t } = useLanguage();
-  const projects = useMemo(
+  const allProjects = useMemo(
     () => sourceProjects.map((project) => localizeProject(project, language)),
     [language],
   );
+  const [filter, setFilter] = useState<ProjectFilter>("all");
+  const projects = useMemo(() => filterProjects(allProjects, filter), [allProjects, filter]);
+  const [exitHeight, setExitHeight] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [cvOpen, setCvOpen] = useState(false);
   const [detailsClosing, setDetailsClosing] = useState(false);
@@ -34,7 +39,7 @@ export function ProjectOrbit() {
       delete document.documentElement.dataset.ambientPaused;
     };
   }, [ambientActive]);
-  const activeProject = projects.find((project) => project.id === selected);
+  const activeProject = allProjects.find((project) => project.id === selected);
   const central = useRef<HTMLDivElement>(null);
   const { ref: scene, width, height } = useElementSize<HTMLDivElement>();
   const viewportHeight = useViewportHeight();
@@ -44,10 +49,15 @@ export function ProjectOrbit() {
     [width, viewportHeight, projects.length],
   );
   const positions = layout.offsets;
+  const particleDestinations = useMemo(() => {
+    const byId = new Map(projects.map((project, index) => [project.id, positions[index]]));
+    return allProjects.map((project) => ({ id: project.id, offset: byId.get(project.id) ?? null }));
+  }, [allProjects, projects, positions]);
+  const sceneHeight = Math.max(layout.height, exitHeight);
   const { open, expanded, closing, openProjects, closeProjects, finishClosing } = useOrbitExpansion(
     {
       center: central,
-      sceneHeight: layout.height,
+      sceneHeight,
       viewportHeight,
       reducedMotion,
       hasProjects: positions.length > 0,
@@ -60,11 +70,19 @@ export function ProjectOrbit() {
     setSelected(null);
   }
 
+  function changeFilter(next: ProjectFilter) {
+    if (next === filter) return;
+    const nextProjects = filterProjects(allProjects, next);
+    const hasExits = projects.some((project) => !nextProjects.includes(project));
+    setExitHeight(!reducedMotion && hasExits ? sceneHeight : 0);
+    setFilter(next);
+  }
+
   return (
     <div
       ref={scene}
       className="project-orbit"
-      style={{ minHeight: expanded ? `max(100dvh, ${layout.height}px)` : "100dvh" }}
+      style={{ minHeight: expanded ? `max(100dvh, ${sceneHeight}px)` : "100dvh" }}
       data-open={expanded}
       data-closing={closing}
       onKeyDown={(event) => {
@@ -131,13 +149,35 @@ export function ProjectOrbit() {
             <circle cx="4" cy="4" r="2" />
           </svg>
         </a>
+        <a
+          className="glass-control portfolio-toolbar__button"
+          href="https://github.com/AndreaIzzillo"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`GitHub (${t.newTab})`}
+          title="GitHub"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+          </svg>
+        </a>
       </div>
       <OrbitParticles
         active={ambientActive}
         open={open}
         width={width}
         height={height}
-        projectOffsets={positions}
+        projectDestinations={particleDestinations}
       />
       <div ref={central} className="project-orbit__center">
         <PortraitBubble
@@ -147,7 +187,12 @@ export function ProjectOrbit() {
         />
       </div>
       <div id="project-bubbles" role="group" aria-label={t.projects} inert={!open}>
-        <AnimatePresence onExitComplete={finishClosing}>
+        <AnimatePresence
+          onExitComplete={() => {
+            setExitHeight(0);
+            finishClosing();
+          }}
+        >
           {open &&
             projects.map((project, index) => {
               const position = positions[index];
@@ -201,6 +246,11 @@ export function ProjectOrbit() {
             })}
         </AnimatePresence>
       </div>
+      <AnimatePresence>
+        {open && !activeProject && !cvOpen && (
+          <ProjectFilters value={filter} count={projects.length} onChange={changeFilter} />
+        )}
+      </AnimatePresence>
       {activeProject && (
         <ProjectDetails
           key={activeProject.id}

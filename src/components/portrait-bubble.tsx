@@ -1,6 +1,6 @@
 "use client";
 
-import { m } from "motion/react";
+import { m, useIsPresent } from "motion/react";
 import { useId, type CSSProperties, type MouseEventHandler } from "react";
 
 import { ResponsiveImage } from "@/components/responsive-image";
@@ -65,6 +65,7 @@ export function FloatingBubble({
 }: BubbleProps) {
   const { t } = useLanguage();
   const { anchorRef, reducedMotion, x, y } = useMagneticPull<HTMLDivElement>(active);
+  const isPresent = useIsPresent();
   const titlePathId = useId();
   // Account for cover cropping, intentional zoom and hover scale on high-DPI displays.
   const sourceScale = Math.max(1, image.width / image.height) * (project ? imageZoom : 1.1) * 1.06;
@@ -93,6 +94,7 @@ export function FloatingBubble({
         >
           <button
             type="button"
+            disabled={!isPresent}
             className="portrait-bubble"
             onClick={onClick}
             aria-label={label}
