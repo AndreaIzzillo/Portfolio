@@ -22,6 +22,13 @@ export const languageNames: Record<Language, string> = {
 };
 
 type Messages = {
+  portfolioTools: string;
+  showCv: string;
+  cvTitle: string;
+  closeCv: string;
+  downloadCv: string;
+  openCv: string;
+  cvPreview: string;
   techStack: string;
   showProjects: string;
   hideProjects: string;
@@ -33,6 +40,7 @@ type Messages = {
   previousImage: string;
   code: string;
   demo: string;
+  presentation: string;
   newTab: string;
   portrait: string;
   showImage: (index: number) => string;
@@ -43,6 +51,13 @@ type Messages = {
 
 export const messages: Record<Language, Messages> = {
   fr: {
+    portfolioTools: "Ressources du portfolio",
+    showCv: "Afficher mon CV",
+    cvTitle: "Mon CV",
+    closeCv: "Fermer le CV",
+    downloadCv: "Télécharger",
+    openCv: "Ouvrir le PDF",
+    cvPreview: "CV d’Andrea Izzillo en français",
     techStack: "Stack technique",
     showProjects: "Afficher les projets",
     hideProjects: "Masquer les projets",
@@ -58,11 +73,19 @@ export const messages: Record<Language, Messages> = {
     imageAlt: (n: number, title: string) => `Image ${n} — ${title}`,
     code: "Voir le code",
     demo: "Voir la démo",
+    presentation: "Voir la présentation",
     newTab: "nouvel onglet",
     portrait: "Portrait d’Andrea Izzillo",
     switchLanguage: (next: string) => `Changer de langue : ${next}`,
   },
   en: {
+    portfolioTools: "Portfolio resources",
+    showCv: "View my CV",
+    cvTitle: "My CV",
+    closeCv: "Close CV",
+    downloadCv: "Download",
+    openCv: "Open PDF",
+    cvPreview: "Andrea Izzillo’s CV in English",
     techStack: "Tech stack",
     showProjects: "Show projects",
     hideProjects: "Hide projects",
@@ -77,11 +100,19 @@ export const messages: Record<Language, Messages> = {
     imageAlt: (n: number, title: string) => `Image ${n} — ${title}`,
     code: "View code",
     demo: "Watch demo",
+    presentation: "View presentation",
     newTab: "new tab",
     portrait: "Portrait of Andrea Izzillo",
     switchLanguage: (next: string) => `Switch language to ${next}`,
   },
   ja: {
+    portfolioTools: "ポートフォリオ資料",
+    showCv: "履歴書を表示",
+    cvTitle: "履歴書",
+    closeCv: "履歴書を閉じる",
+    downloadCv: "ダウンロード",
+    openCv: "PDFを開く",
+    cvPreview: "Andrea Izzilloの履歴書（フランス語）",
     techStack: "使用技術",
     showProjects: "プロジェクトを表示",
     hideProjects: "プロジェクトを閉じる",
@@ -96,6 +127,7 @@ export const messages: Record<Language, Messages> = {
     imageAlt: (n: number, title: string) => `${title}の画像${n}`,
     code: "コードを見る",
     demo: "デモを見る",
+    presentation: "発表資料を見る",
     newTab: "新しいタブ",
     portrait: "Andrea Izzilloのポートレート",
     switchLanguage: (next: string) => `言語を${next}に切り替える`,

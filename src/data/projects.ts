@@ -14,6 +14,10 @@ const doomLikeDoom = getMedia("DoomLike/doom.png");
 const doomLikeMc = getMedia("DoomLike/mc.png");
 const doomLikeShining = getMedia("DoomLike/shining.png");
 const gpgpuPeople = getMedia("GPGPU/people.png");
+const ivokSignalsBoxes = getMedia("IVoKSignals/boxes.png");
+const ivokSignalsBright = getMedia("IVoKSignals/bright.png");
+const ivokSignalsDark = getMedia("IVoKSignals/dark.png");
+const ivokSignalsTwo = getMedia("IVoKSignals/two.png");
 const outerGLNewStart = getMedia("OuterGL/A_new_start.png");
 const outerGLSpace = getMedia("OuterGL/A_wide_and_empty_space.png");
 const outerGLEclipse = getMedia("OuterGL/Is_this_a_solar_eclipse.png");
@@ -22,6 +26,9 @@ const outerGLSystem = getMedia("OuterGL/The_full_system.png");
 const reprAll = getMedia("REPR/all.png");
 const reprDemo = getMedia("REPR/demo.gif");
 const reprSide = getMedia("REPR/side.png");
+const rayTracerEarth = getMedia("RayTracer/earth.png");
+const rayTracerLights = getMedia("RayTracer/lights.png");
+const rayTracerSuzanne = getMedia("RayTracer/suzanne.png");
 
 type ProjectAsset = {
   src: MediaAsset;
@@ -38,9 +45,10 @@ export type Project = {
   description: string;
   stack?: readonly string[];
   images: NonEmptyArray<ProjectImage>;
-  cover?: ProjectAsset & { position?: string; zoom?: number };
+  cover?: ProjectAsset & { position?: string; zoom?: number; zoomOrigin?: string };
   repoUrl?: string;
   demoUrl?: string;
+  presentationUrl?: string;
 };
 
 type ProjectText = Pick<Project, "title" | "subtitle" | "description">;
@@ -52,6 +60,7 @@ export type ProjectDefinition = {
   cover?: Project["cover"];
   repoUrl?: string;
   demoUrl?: string;
+  presentationUrl?: string;
   translations: Record<"fr", ProjectText> & Partial<Record<Exclude<Language, "fr">, ProjectText>>;
 };
 
@@ -197,17 +206,70 @@ export const projects: ProjectDefinition[] = [
       },
     },
   },
+  {
+    id: 6,
+    stack: ["C++17", "Make"],
+    cover: { src: rayTracerSuzanne },
+    images: [{ src: rayTracerSuzanne }, { src: rayTracerLights }, { src: rayTracerEarth }],
+    repoUrl: "https://github.com/AndreaIzzillo/ISIM-TP-RayTracer",
+    translations: {
+      fr: {
+        title: "Raytracer CPU",
+        subtitle: "Rendu par lancer de rayons et modèle de Phong",
+        description:
+          "Développement d’un raytracer CPU en C++ dans le cadre d’un TP de synthèse d’images. Le rendu suit le modèle d’éclairage de Phong, avec gestion des ombres, des réflexions récursives et des textures. Prise en charge de sphères et de maillages chargés depuis des fichiers OBJ.",
+      },
+      en: {
+        title: "CPU Raytracer",
+        subtitle: "Ray tracing with the Phong shading model",
+        description:
+          "Development of a CPU raytracer in C++ for a computer graphics course assignment. Rendering uses the Phong shading model, with shadows, recursive reflections and textures. Support for spheres and meshes loaded from OBJ files.",
+      },
+    },
+  },
+  {
+    id: 7,
+    stack: ["Python", "C++", "HOG", "HSV", "Linear SVM"],
+    cover: {
+      src: ivokSignalsTwo,
+      position: "-30% 50%",
+      zoom: 2.35,
+      zoomOrigin: "40% 70%",
+    },
+    images: [
+      { src: ivokSignalsBright },
+      { src: ivokSignalsDark },
+      { src: ivokSignalsTwo },
+      { src: ivokSignalsBoxes },
+    ],
+    presentationUrl: "/presentations/ivok-signals.pdf",
+    translations: {
+      fr: {
+        title: "IVoK Signals",
+        subtitle: "Détection de panneaux routiers",
+        description:
+          "Développement en binôme d’un programme de détection et de reconnaissance de panneaux routiers, prototypé en Python puis réimplémenté en C++. Recherche de zones candidates à partir des couleurs et des contours, puis extraction de descripteurs HOG, d’un histogramme HSV et de statistiques de couleur. Un premier SVM distingue les panneaux du décor, puis un second identifie leur classe.",
+      },
+      en: {
+        title: "IVoK Signals",
+        subtitle: "Traffic sign detection",
+        description:
+          "Traffic sign detection and recognition program developed in a team of two, prototyped in Python then reimplemented in C++. Candidate regions are located using colours and contours, then described using HOG features, an HSV histogram and colour statistics. A first SVM separates signs from the background, and a second identifies their class.",
+      },
+    },
+  },
 ];
 
 export function localizeProject(project: ProjectDefinition, language: Language): Project {
   const translation = project.translations[language] ?? project.translations.fr;
-  const { images, id, cover, repoUrl, demoUrl, stack } = project;
+  const { images, id, cover, repoUrl, demoUrl, presentationUrl, stack } = project;
   return {
     id,
     stack,
     cover,
     repoUrl,
     demoUrl,
+    presentationUrl,
     ...translation,
     images: mapNonEmpty(images, (image, index) => ({
       ...image,
