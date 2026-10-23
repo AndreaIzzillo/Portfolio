@@ -12,6 +12,7 @@ import { ProjectDetails } from "@/components/project-details";
 import { localizeProject, projects as sourceProjects } from "@/data/projects";
 import { usePageVisible } from "@/hooks/use-page-visible";
 import { useElementSize } from "@/hooks/use-element-size";
+import { useOrbitExpansion } from "@/hooks/use-orbit-expansion";
 import { useViewportHeight } from "@/hooks/use-viewport-height";
 import { getProjectLayout } from "@/lib/orbit-layout";
 
@@ -21,7 +22,6 @@ export function ProjectOrbit() {
     () => sourceProjects.map((project) => localizeProject(project, language)),
     [language],
   );
-  const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
   const [cvOpen, setCvOpen] = useState(false);
   const [detailsClosing, setDetailsClosing] = useState(false);
@@ -44,10 +44,19 @@ export function ProjectOrbit() {
     [width, viewportHeight, projects.length],
   );
   const positions = layout.offsets;
+  const { open, expanded, closing, openProjects, closeProjects, finishClosing } = useOrbitExpansion(
+    {
+      center: central,
+      sceneHeight: layout.height,
+      viewportHeight,
+      reducedMotion,
+      hasProjects: positions.length > 0,
+    },
+  );
 
   function close() {
     central.current?.querySelector("button")?.focus({ preventScroll: true });
-    setOpen(false);
+    closeProjects();
     setSelected(null);
   }
 
@@ -55,8 +64,9 @@ export function ProjectOrbit() {
     <div
       ref={scene}
       className="project-orbit"
-      style={{ minHeight: `max(100dvh, ${layout.height}px)` }}
-      data-open={open}
+      style={{ minHeight: expanded ? `max(100dvh, ${layout.height}px)` : "100dvh" }}
+      data-open={expanded}
+      data-closing={closing}
       onKeyDown={(event) => {
         if (event.key === "Escape" && open && selected === null && !cvOpen) {
           event.preventDefault();
@@ -133,11 +143,11 @@ export function ProjectOrbit() {
         <PortraitBubble
           active={ambientActive}
           expanded={open}
-          onClick={() => (open ? close() : setOpen(true))}
+          onClick={() => (open ? close() : openProjects())}
         />
       </div>
       <div id="project-bubbles" role="group" aria-label={t.projects} inert={!open}>
-        <AnimatePresence>
+        <AnimatePresence onExitComplete={finishClosing}>
           {open &&
             projects.map((project, index) => {
               const position = positions[index];

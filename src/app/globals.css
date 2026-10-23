@@ -197,20 +197,15 @@ body {
   letter-spacing: 0;
 }
 
-@media (max-height: 700px) {
-  .portfolio-slogan {
-    position: static;
-    padding-block: 12px max(20px, env(safe-area-inset-bottom));
-  }
-}
-
 /* Interactive bubbles */
 
 .project-orbit {
   position: relative;
   width: 100%;
-  min-height: max(560px, 100dvh);
+  min-height: 100svh;
+  min-height: 100dvh;
   overflow: clip;
+  overflow-anchor: none;
 }
 
 .project-orbit__center,
