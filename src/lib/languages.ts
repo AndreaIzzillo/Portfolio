@@ -1,3 +1,5 @@
+import type { ProjectFilter } from "@/lib/project-filters";
+
 export const languages = ["fr", "en", "ja"] as const;
 export type Language = (typeof languages)[number];
 
@@ -33,6 +35,9 @@ type Messages = {
   showProjects: string;
   hideProjects: string;
   projects: string;
+  projectFilters: string;
+  projectCategories: Record<ProjectFilter, string>;
+  projectCount: (count: number) => string;
   discover: string;
   closeProject: string;
   gallery: string;
@@ -62,6 +67,10 @@ export const messages: Record<Language, Messages> = {
     showProjects: "Afficher les projets",
     hideProjects: "Masquer les projets",
     projects: "Projets",
+    projectFilters: "Filtrer les projets",
+    projectCategories: { all: "Tout", graphics: "Synthèse", processing: "Traitement", gpu: "GPU" },
+    projectCount: (count) =>
+      `${count} projet${count > 1 ? "s" : ""} affiché${count > 1 ? "s" : ""}`,
     discover: "Découvrir",
     closeProject: "Fermer le projet",
     gallery: "Images du projet",
@@ -90,6 +99,9 @@ export const messages: Record<Language, Messages> = {
     showProjects: "Show projects",
     hideProjects: "Hide projects",
     projects: "Projects",
+    projectFilters: "Filter projects",
+    projectCategories: { all: "All", graphics: "Graphics", processing: "Processing", gpu: "GPU" },
+    projectCount: (count) => `${count} project${count === 1 ? "" : "s"} shown`,
     discover: "Explore",
     closeProject: "Close project",
     gallery: "Project images",
@@ -117,6 +129,9 @@ export const messages: Record<Language, Messages> = {
     showProjects: "プロジェクトを表示",
     hideProjects: "プロジェクトを閉じる",
     projects: "プロジェクト",
+    projectFilters: "プロジェクトを絞り込む",
+    projectCategories: { all: "すべて", graphics: "CG", processing: "画像処理", gpu: "GPU" },
+    projectCount: (count) => `${count}件のプロジェクトを表示`,
     discover: "詳しく見る：",
     closeProject: "プロジェクトを閉じる",
     gallery: "プロジェクトの画像",

@@ -6,7 +6,11 @@ import { useReducedMotion } from "motion/react";
 import { animationSettings, canvasPixelRatio } from "@/lib/animation-settings";
 import { createParticleSprite } from "@/lib/particle-sprite";
 import { createOrbitParticles } from "@/lib/orbit-particle-model";
-import type { ProjectOffset } from "@/lib/orbit-layout";
+import {
+  advanceParticleTransitions,
+  reconcileParticleTransitions,
+  type ParticleDestination,
+} from "@/lib/orbit-particle-transitions";
 
 const COLORS = [
   "91, 174, 160",
@@ -22,17 +26,18 @@ export function OrbitParticles({
   active,
   width,
   height,
-  projectOffsets,
+  projectDestinations,
 }: {
   open: boolean;
   active: boolean;
   width: number;
   height: number;
-  projectOffsets: readonly ProjectOffset[];
+  projectDestinations: readonly ParticleDestination[];
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const progress = useRef(0);
   const elapsed = useRef(0);
+  const transitions = useRef<ReturnType<typeof reconcileParticleTransitions>>([]);
   const resources = useRef<{
     projectCount: number;
     mobile: boolean;
@@ -64,13 +69,13 @@ export function OrbitParticles({
     // A modal only pauses drawing; keep the textures and simulation ready for resuming.
     if (
       !resources.current ||
-      resources.current.projectCount !== projectOffsets.length ||
+      resources.current.projectCount !== projectDestinations.length ||
       resources.current.mobile !== mobile ||
       resources.current.ratio !== ratio
     ) {
-      const particles = createOrbitParticles(projectOffsets.length, mobile);
+      const particles = createOrbitParticles(projectDestinations.length, mobile);
       resources.current = {
-        projectCount: projectOffsets.length,
+        projectCount: projectDestinations.length,
         mobile,
         ratio,
         particles,
@@ -85,7 +90,9 @@ export function OrbitParticles({
       };
     }
     const { particles, sprites } = resources.current;
-    const targets = projectOffsets.map(() => ({ x: 0, y: 0, bend: 0, nx: 0, ny: 0 }));
+    transitions.current = reconcileParticleTransitions(transitions.current, projectDestinations);
+    const destinations = transitions.current;
+    const targets = destinations.map(() => ({ x: 0, y: 0, bend: 0, nx: 0, ny: 0, opacity: 0 }));
     let canvasBounds = surface.getBoundingClientRect();
     let boundsDirty = false;
     const markBoundsDirty = () => {
@@ -106,6 +113,7 @@ export function OrbitParticles({
       }
       const dt = lastTime ? Math.min((now - lastTime) / 1000, 0.05) : 0;
       lastTime = now;
+      advanceParticleTransitions(destinations, dt, Boolean(reducedMotion));
       elapsed.current += dt;
       const time = reducedMotion ? 0 : elapsed.current;
       const targetProgress = open ? 1 : 0;
@@ -129,10 +137,11 @@ export function OrbitParticles({
         : height / 2;
       const coreRadius = (portraitBounds?.width ?? 170) / 2;
       // Moving the source must not displace the destinations around the projects.
-      projectOffsets.forEach((offset, group) => {
+      destinations.forEach((offset, group) => {
         const target = targets[group]!;
         target.x = width / 2 + offset.x - cx;
         target.y = height / 2 + offset.y - cy;
+        target.opacity = offset.opacity;
         const length = Math.max(1, Math.hypot(target.x, target.y));
         target.bend = (group % 2 ? -1 : 1) * Math.min(75, length * 0.24);
         target.nx = -target.y / length;
@@ -142,16 +151,17 @@ export function OrbitParticles({
 
       // Hairline paths remain after the burst, with beads travelling along them.
       targets.forEach((target, group) => {
-        const { bend, nx, ny } = target;
+        const { bend, nx, ny, opacity } = target;
+        if (opacity === 0) return;
         context.beginPath();
         context.moveTo(cx, cy);
         context.quadraticCurveTo(
-          cx + target.x * 0.5 + nx * bend,
-          cy + target.y * 0.5 + ny * bend,
-          cx + target.x,
-          cy + target.y,
+          cx + (target.x * 0.5 + nx * bend) * opacity,
+          cy + (target.y * 0.5 + ny * bend) * opacity,
+          cx + target.x * opacity,
+          cy + target.y * opacity,
         );
-        context.strokeStyle = `rgba(${COLORS[group % COLORS.length]}, ${p * 0.18})`;
+        context.strokeStyle = `rgba(${COLORS[group % COLORS.length]}, ${p * opacity * 0.18})`;
         context.lineWidth = 0.8;
         context.stroke();
       });
@@ -168,6 +178,10 @@ export function OrbitParticles({
       particles.forEach((particle, index) => {
         const target = targets[particle.group];
         if (!target) return;
+        const visibility = 1 - p + p * target.opacity;
+        if (visibility < 0.001) return;
+        const particleProgress = p * target.opacity;
+        const particleBurst = Math.sin(particleProgress * Math.PI);
         const angle = particle.phase + time * (0.12 + particle.seed * 0.09);
         const orbit =
           coreRadius + 13 + particle.seed * 34 + Math.sin(time * 0.7 + particle.phase) * 6;
@@ -191,14 +205,23 @@ export function OrbitParticles({
           endY = target.y + Math.sin(angle * 1.2) * halo;
         }
 
-        const swirl = burst * (22 + particle.seed * 55);
-        const x = cx + startX * (1 - p) + endX * p + Math.cos(angle + p * 2) * swirl;
-        const y = cy + startY * (1 - p) + endY * p + Math.sin(angle + p * 2) * swirl;
-        const alpha = 0.35 + 0.4 * (0.5 + 0.5 * Math.sin(time * 1.4 + particle.phase));
+        const swirl = particleBurst * (22 + particle.seed * 55);
+        const x =
+          cx +
+          startX * (1 - particleProgress) +
+          endX * particleProgress +
+          Math.cos(angle + particleProgress * 2) * swirl;
+        const y =
+          cy +
+          startY * (1 - particleProgress) +
+          endY * particleProgress +
+          Math.sin(angle + particleProgress * 2) * swirl;
+        const alpha =
+          (0.35 + 0.4 * (0.5 + 0.5 * Math.sin(time * 1.4 + particle.phase))) * visibility;
         const color = COLORS[particle.group % COLORS.length] ?? COLORS[0];
 
         // Short trails only during the explosion or reabsorption; no full-screen blur.
-        if (burst > 0.08 && particle.trail.length > 1 && !reducedMotion) {
+        if (particleBurst > 0.08 && particle.trail.length > 1 && !reducedMotion) {
           const [trailStart] = particle.trail;
           if (!trailStart) return;
 
@@ -206,11 +229,11 @@ export function OrbitParticles({
           context.moveTo(trailStart.x, trailStart.y);
           particle.trail.forEach((point) => context.lineTo(point.x, point.y));
           context.lineTo(x, y);
-          context.strokeStyle = `rgba(${color}, ${alpha * burst * 0.4})`;
+          context.strokeStyle = `rgba(${color}, ${alpha * particleBurst * 0.4})`;
           context.lineWidth = particle.radius * 0.65;
           context.stroke();
         }
-        if (burst > 0.08 && !reducedMotion) {
+        if (particleBurst > 0.08 && !reducedMotion) {
           const point = particle.trail.length >= 5 ? particle.trail.shift()! : { x, y };
           point.x = x;
           point.y = y;
@@ -259,7 +282,7 @@ export function OrbitParticles({
       window.removeEventListener("resize", markBoundsDirty);
       document.removeEventListener("visibilitychange", resume);
     };
-  }, [open, active, width, height, reducedMotion, projectOffsets]);
+  }, [open, active, width, height, reducedMotion, projectDestinations]);
 
   return <canvas ref={canvas} className="orbit-particles" aria-hidden="true" />;
 }

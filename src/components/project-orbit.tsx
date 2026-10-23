@@ -9,19 +9,24 @@ import { useLanguage } from "@/components/language-provider";
 import { OrbitParticles } from "@/components/orbit-particles";
 import { FloatingBubble, PortraitBubble } from "@/components/portrait-bubble";
 import { ProjectDetails } from "@/components/project-details";
+import { ProjectFilters } from "@/components/project-filters";
 import { localizeProject, projects as sourceProjects } from "@/data/projects";
 import { usePageVisible } from "@/hooks/use-page-visible";
 import { useElementSize } from "@/hooks/use-element-size";
 import { useOrbitExpansion } from "@/hooks/use-orbit-expansion";
 import { useViewportHeight } from "@/hooks/use-viewport-height";
 import { getProjectLayout } from "@/lib/orbit-layout";
+import { filterProjects, type ProjectFilter } from "@/lib/project-filters";
 
 export function ProjectOrbit() {
   const { language, t } = useLanguage();
-  const projects = useMemo(
+  const allProjects = useMemo(
     () => sourceProjects.map((project) => localizeProject(project, language)),
     [language],
   );
+  const [filter, setFilter] = useState<ProjectFilter>("all");
+  const projects = useMemo(() => filterProjects(allProjects, filter), [allProjects, filter]);
+  const [exitHeight, setExitHeight] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [cvOpen, setCvOpen] = useState(false);
   const [detailsClosing, setDetailsClosing] = useState(false);
@@ -34,7 +39,7 @@ export function ProjectOrbit() {
       delete document.documentElement.dataset.ambientPaused;
     };
   }, [ambientActive]);
-  const activeProject = projects.find((project) => project.id === selected);
+  const activeProject = allProjects.find((project) => project.id === selected);
   const central = useRef<HTMLDivElement>(null);
   const { ref: scene, width, height } = useElementSize<HTMLDivElement>();
   const viewportHeight = useViewportHeight();
@@ -44,10 +49,15 @@ export function ProjectOrbit() {
     [width, viewportHeight, projects.length],
   );
   const positions = layout.offsets;
+  const particleDestinations = useMemo(() => {
+    const byId = new Map(projects.map((project, index) => [project.id, positions[index]]));
+    return allProjects.map((project) => ({ id: project.id, offset: byId.get(project.id) ?? null }));
+  }, [allProjects, projects, positions]);
+  const sceneHeight = Math.max(layout.height, exitHeight);
   const { open, expanded, closing, openProjects, closeProjects, finishClosing } = useOrbitExpansion(
     {
       center: central,
-      sceneHeight: layout.height,
+      sceneHeight,
       viewportHeight,
       reducedMotion,
       hasProjects: positions.length > 0,
@@ -60,11 +70,19 @@ export function ProjectOrbit() {
     setSelected(null);
   }
 
+  function changeFilter(next: ProjectFilter) {
+    if (next === filter) return;
+    const nextProjects = filterProjects(allProjects, next);
+    const hasExits = projects.some((project) => !nextProjects.includes(project));
+    setExitHeight(!reducedMotion && hasExits ? sceneHeight : 0);
+    setFilter(next);
+  }
+
   return (
     <div
       ref={scene}
       className="project-orbit"
-      style={{ minHeight: expanded ? `max(100dvh, ${layout.height}px)` : "100dvh" }}
+      style={{ minHeight: expanded ? `max(100dvh, ${sceneHeight}px)` : "100dvh" }}
       data-open={expanded}
       data-closing={closing}
       onKeyDown={(event) => {
@@ -159,7 +177,7 @@ export function ProjectOrbit() {
         open={open}
         width={width}
         height={height}
-        projectOffsets={positions}
+        projectDestinations={particleDestinations}
       />
       <div ref={central} className="project-orbit__center">
         <PortraitBubble
@@ -169,7 +187,12 @@ export function ProjectOrbit() {
         />
       </div>
       <div id="project-bubbles" role="group" aria-label={t.projects} inert={!open}>
-        <AnimatePresence onExitComplete={finishClosing}>
+        <AnimatePresence
+          onExitComplete={() => {
+            setExitHeight(0);
+            finishClosing();
+          }}
+        >
           {open &&
             projects.map((project, index) => {
               const position = positions[index];
@@ -223,6 +246,11 @@ export function ProjectOrbit() {
             })}
         </AnimatePresence>
       </div>
+      <AnimatePresence>
+        {open && !activeProject && !cvOpen && (
+          <ProjectFilters value={filter} count={projects.length} onChange={changeFilter} />
+        )}
+      </AnimatePresence>
       {activeProject && (
         <ProjectDetails
           key={activeProject.id}

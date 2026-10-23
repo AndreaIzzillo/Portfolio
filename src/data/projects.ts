@@ -2,6 +2,7 @@ import { getMedia, type MediaAsset } from "@/lib/media";
 
 import { mapNonEmpty, type NonEmptyArray } from "@/lib/arrays";
 import { messages, type Language } from "@/lib/languages";
+import type { ProjectCategory } from "@/lib/project-filters";
 const chromAuraAura = getMedia("ChromAura/aura.png");
 const chromAuraColorful = getMedia("ChromAura/colorful.png");
 const chromAuraGunner = getMedia("ChromAura/gunner.png");
@@ -40,6 +41,7 @@ export type ProjectImage = ProjectAsset & {
 
 export type Project = {
   id: number;
+  categories: readonly ProjectCategory[];
   title: string;
   subtitle: string;
   description: string;
@@ -55,6 +57,7 @@ type ProjectText = Pick<Project, "title" | "subtitle" | "description">;
 
 export type ProjectDefinition = {
   id: number;
+  categories: Project["categories"];
   stack?: Project["stack"];
   images: NonEmptyArray<ProjectAsset>;
   cover?: Project["cover"];
@@ -68,6 +71,7 @@ export type ProjectDefinition = {
 export const projects: ProjectDefinition[] = [
   {
     id: 1,
+    categories: ["graphics", "gpu"],
     stack: ["C++17", "OpenGL 4.3", "GLSL", "GLEW", "FreeGLUT", "GLM", "tinygltf", "CMake"],
     cover: { src: outerGLNewStart, position: "45% 50%", zoom: 1.85 },
     images: [
@@ -101,6 +105,7 @@ export const projects: ProjectDefinition[] = [
   },
   {
     id: 2,
+    categories: ["graphics"],
     stack: ["C++17", "SFML 3", "OpenMP", "CMake"],
     cover: { src: doomLikeMc, position: "20% 50%" },
     images: [
@@ -135,6 +140,7 @@ export const projects: ProjectDefinition[] = [
   },
   {
     id: 3,
+    categories: ["graphics", "processing"],
     stack: ["Godot 4", "C#", ".NET 8", "GDScript", "MediaPipe / GDMP", "Kinect / gd-depthcam"],
     cover: { src: chromAuraRonaldo },
     images: [
@@ -168,6 +174,7 @@ export const projects: ProjectDefinition[] = [
   },
   {
     id: 4,
+    categories: ["processing", "gpu"],
     stack: ["C++17", "CUDA", "cuRAND", "GStreamer", "CMake"],
     cover: { src: gpgpuPeople, zoom: 1.4 },
     images: [{ src: gpgpuPeople }],
@@ -188,6 +195,7 @@ export const projects: ProjectDefinition[] = [
   },
   {
     id: 5,
+    categories: ["graphics", "gpu"],
     stack: ["TypeScript", "WebGL 2", "GLSL", "Vite"],
     cover: { src: reprSide },
     images: [{ src: reprSide }, { src: reprAll }, { src: reprDemo }],
@@ -208,6 +216,7 @@ export const projects: ProjectDefinition[] = [
   },
   {
     id: 6,
+    categories: ["graphics"],
     stack: ["C++17", "Make"],
     cover: { src: rayTracerSuzanne },
     images: [{ src: rayTracerSuzanne }, { src: rayTracerLights }, { src: rayTracerEarth }],
@@ -229,6 +238,7 @@ export const projects: ProjectDefinition[] = [
   },
   {
     id: 7,
+    categories: ["processing"],
     stack: ["Python", "C++", "HOG", "HSV", "Linear SVM"],
     cover: {
       src: ivokSignalsTwo,
@@ -262,9 +272,10 @@ export const projects: ProjectDefinition[] = [
 
 export function localizeProject(project: ProjectDefinition, language: Language): Project {
   const translation = project.translations[language] ?? project.translations.fr;
-  const { images, id, cover, repoUrl, demoUrl, presentationUrl, stack } = project;
+  const { images, id, categories, cover, repoUrl, demoUrl, presentationUrl, stack } = project;
   return {
     id,
+    categories,
     stack,
     cover,
     repoUrl,
