@@ -37,6 +37,7 @@ L’hébergement utilise un export statique : aucun serveur Node.js en productio
 | Fiche et galerie                              | `src/components/project-details.tsx`, `project-gallery.tsx`                                                  |
 | Données, liens, textes et stacks              | `src/data/projects.ts`                                                                                       |
 | Traductions et préférence de langue           | `src/lib/languages.ts`, `src/components/language-provider.tsx`                                               |
+| Consultation et téléchargement du CV          | `src/components/cv-details.tsx`, `src/data/cv.ts`, `public/cv/`, `assets/images/CV/`                         |
 | Placement des bulles                          | `src/lib/orbit-layout.ts`                                                                                    |
 | Modèle et rendu des particules                | `src/lib/orbit-particle-model.ts`, `src/components/orbit-particles.tsx`                                      |
 | Budget et textures des particules             | `src/lib/animation-settings.ts`, `particle-sprite.ts`                                                        |
@@ -174,6 +175,36 @@ ignorés par Git. Le cache conserve les fichiers inchangés ; les URLs comporten
 une empreinte qui change avec le contenu ou les paramètres. Les paramètres de
 qualité et de taille se trouvent dans `scripts/optimize-media.mjs`.
 `FFMPEG_PATH` et `FFPROBE_PATH` permettent de préciser les exécutables.
+
+## CV et ressources du portfolio
+
+La colonne de boutons en haut à gauche est définie dans `ProjectOrbit` et reste
+verticale lors de l’ajout de ressources. Les boutons CV puis LinkedIn affichent
+uniquement leurs icônes, avec des libellés accessibles et des infobulles.
+LinkedIn ouvre le profil `https://www.linkedin.com/in/andreaizzillo/` dans un
+nouvel onglet. Le bouton CV ouvre `CvDetails` ;
+`BubbleDialog` mutualise avec les fiches projet les transitions, le focus,
+le défilement et la fermeture au clavier ou au clic extérieur.
+
+Les PDF originaux français et anglais sont versionnés dans `public/cv/`.
+`src/data/cv.ts` associe chaque langue au PDF et à son aperçu ; les URL utilisent
+`mediaUrl` pour respecter le sous-chemin d’hébergement. Le téléchargement et le
+lien d’ouverture du PDF suivent immédiatement la langue active. Le japonais
+reste désactivé et utilise le CV français en repli.
+
+L’aperçu utilise les images `assets/images/CV/fr.png` et `en.png`, puis la chaîne
+habituelle de médias responsifs. Cela évite de charger un lecteur PDF pour la
+consultation, notamment sur mobile. Après remplacement d’un PDF, régénérer
+l’aperçu correspondant avec Poppler puis les variantes :
+
+```sh
+pdftoppm -singlefile -scale-to 2000 -png public/cv/CV_Andrea_Izzillo_FR.pdf assets/images/CV/fr
+pdftoppm -singlefile -scale-to 2000 -png public/cv/CV_Andrea_Izzillo_EN.pdf assets/images/CV/en
+npm run media:build
+```
+
+Les CV actuels tiennent sur une page. Adapter le modèle et l’affichage si un
+remplacement comporte plusieurs pages, plutôt que de n’en afficher que la première.
 
 ## Budget d’animation
 

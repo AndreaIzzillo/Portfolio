@@ -22,6 +22,13 @@ export const languageNames: Record<Language, string> = {
 };
 
 type Messages = {
+  portfolioTools: string;
+  showCv: string;
+  cvTitle: string;
+  closeCv: string;
+  downloadCv: string;
+  openCv: string;
+  cvPreview: string;
   techStack: string;
   showProjects: string;
   hideProjects: string;
@@ -43,6 +50,13 @@ type Messages = {
 
 export const messages: Record<Language, Messages> = {
   fr: {
+    portfolioTools: "Ressources du portfolio",
+    showCv: "Afficher mon CV",
+    cvTitle: "Mon CV",
+    closeCv: "Fermer le CV",
+    downloadCv: "Télécharger",
+    openCv: "Ouvrir le PDF",
+    cvPreview: "CV d’Andrea Izzillo en français",
     techStack: "Stack technique",
     showProjects: "Afficher les projets",
     hideProjects: "Masquer les projets",
@@ -63,6 +77,13 @@ export const messages: Record<Language, Messages> = {
     switchLanguage: (next: string) => `Changer de langue : ${next}`,
   },
   en: {
+    portfolioTools: "Portfolio resources",
+    showCv: "View my CV",
+    cvTitle: "My CV",
+    closeCv: "Close CV",
+    downloadCv: "Download",
+    openCv: "Open PDF",
+    cvPreview: "Andrea Izzillo’s CV in English",
     techStack: "Tech stack",
     showProjects: "Show projects",
     hideProjects: "Hide projects",
@@ -82,6 +103,13 @@ export const messages: Record<Language, Messages> = {
     switchLanguage: (next: string) => `Switch language to ${next}`,
   },
   ja: {
+    portfolioTools: "ポートフォリオ資料",
+    showCv: "履歴書を表示",
+    cvTitle: "履歴書",
+    closeCv: "履歴書を閉じる",
+    downloadCv: "ダウンロード",
+    openCv: "PDFを開く",
+    cvPreview: "Andrea Izzilloの履歴書（フランス語）",
     techStack: "使用技術",
     showProjects: "プロジェクトを表示",
     hideProjects: "プロジェクトを閉じる",

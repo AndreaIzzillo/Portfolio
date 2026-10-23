@@ -3,10 +3,12 @@
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import type { BubbleOrigin } from "@/components/bubble-dialog";
+import { CvDetails } from "@/components/cv-details";
 import { useLanguage } from "@/components/language-provider";
 import { OrbitParticles } from "@/components/orbit-particles";
 import { FloatingBubble, PortraitBubble } from "@/components/portrait-bubble";
-import { ProjectDetails, type BubbleOrigin } from "@/components/project-details";
+import { ProjectDetails } from "@/components/project-details";
 import { localizeProject, projects as sourceProjects } from "@/data/projects";
 import { usePageVisible } from "@/hooks/use-page-visible";
 import { useElementSize } from "@/hooks/use-element-size";
@@ -20,10 +22,11 @@ export function ProjectOrbit() {
   );
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
+  const [cvOpen, setCvOpen] = useState(false);
   const [detailsClosing, setDetailsClosing] = useState(false);
   const [origin, setOrigin] = useState<BubbleOrigin>({ x: 0, y: 0 });
   const pageVisible = usePageVisible();
-  const ambientActive = pageVisible && (selected === null || detailsClosing);
+  const ambientActive = pageVisible && ((selected === null && !cvOpen) || detailsClosing);
   useEffect(() => {
     document.documentElement.dataset.ambientPaused = String(!ambientActive);
     return () => {
@@ -52,12 +55,70 @@ export function ProjectOrbit() {
       style={{ minHeight: `max(100dvh, ${getProjectSceneHeight(width, projects.length)}px)` }}
       data-open={open}
       onKeyDown={(event) => {
-        if (event.key === "Escape" && open && selected === null) {
+        if (event.key === "Escape" && open && selected === null && !cvOpen) {
           event.preventDefault();
           close();
         }
       }}
     >
+      <div className="portfolio-toolbar" role="group" aria-label={t.portfolioTools}>
+        <button
+          type="button"
+          className="glass-control portfolio-toolbar__button"
+          aria-label={t.showCv}
+          title={t.showCv}
+          aria-haspopup="dialog"
+          aria-controls={cvOpen ? "cv-details" : undefined}
+          aria-expanded={cvOpen}
+          onClick={(event) => {
+            event.currentTarget.focus({ preventScroll: true });
+            const rect = event.currentTarget.getBoundingClientRect();
+            setOrigin({
+              x: rect.left + rect.width / 2 - window.innerWidth / 2,
+              y: rect.top + rect.height / 2 - window.innerHeight / 2,
+            });
+            setDetailsClosing(false);
+            setCvOpen(true);
+          }}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zm0 0v5h5M9 12h6M9 16h4" />
+          </svg>
+        </button>
+        <a
+          className="glass-control portfolio-toolbar__button"
+          href="https://www.linkedin.com/in/andreaizzillo/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`LinkedIn (${t.newTab})`}
+          title="LinkedIn"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4V8zM2 9h4v12H2z" />
+            <circle cx="4" cy="4" r="2" />
+          </svg>
+        </a>
+      </div>
       <OrbitParticles
         active={ambientActive}
         open={open}
@@ -134,6 +195,14 @@ export function ProjectOrbit() {
           closing={detailsClosing}
           onRequestClose={() => setDetailsClosing(true)}
           onDismiss={() => setSelected(null)}
+        />
+      )}
+      {cvOpen && (
+        <CvDetails
+          origin={origin}
+          closing={detailsClosing}
+          onRequestClose={() => setDetailsClosing(true)}
+          onDismiss={() => setCvOpen(false)}
         />
       )}
     </div>
