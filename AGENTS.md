@@ -210,10 +210,11 @@ sous-chemin d’hébergement, tandis que les URL externes restent inchangées.
 ## CV et ressources du portfolio
 
 La colonne de boutons en haut à gauche est définie dans `ProjectOrbit` et reste
-verticale lors de l’ajout de ressources. Les boutons CV puis LinkedIn affichent
+verticale lors de l’ajout de ressources. Les boutons CV, LinkedIn puis GitHub affichent
 uniquement leurs icônes, avec des libellés accessibles et des infobulles.
 LinkedIn ouvre le profil `https://www.linkedin.com/in/andreaizzillo/` dans un
-nouvel onglet. Le bouton CV ouvre `CvDetails` ;
+nouvel onglet. GitHub ouvre `https://github.com/AndreaIzzillo` dans un nouvel onglet.
+Le moteur de placement réserve l’espace de ces trois boutons. Le bouton CV ouvre `CvDetails` ;
 `BubbleDialog` mutualise avec les fiches projet les transitions, le focus,
 le défilement et la fermeture au clavier ou au clic extérieur.
 

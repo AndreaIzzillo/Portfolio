@@ -67,7 +67,7 @@ function placeOnEllipse(
     const absolute = { x: width / 2 + point.x, y: height / 2 + point.y };
     if (
       Math.hypot(point.x, point.y) < portraitSeparation ||
-      !outsideControl(absolute, 0, 96, 164, envelope) ||
+      !outsideControl(absolute, 0, 96, 224, envelope) ||
       !outsideControl(absolute, width - 96, width, 112, envelope)
     )
       continue;

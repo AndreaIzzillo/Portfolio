@@ -73,7 +73,7 @@ for (const [width, viewportHeight] of screens) {
         assert(y - title >= 80, `${count}: top controls space occupied`);
         assert(height - y - title >= 80, `${count}: bottom controls space occupied`);
         assert(Math.hypot(point.x, point.y) >= body + portrait + 12, `${count}: portrait overlap`);
-        assert(distanceToRectangle(x, y, 22, 70, 22, 130) >= title, `${count}: toolbar overlap`);
+        assert(distanceToRectangle(x, y, 22, 70, 22, 190) >= title, `${count}: toolbar overlap`);
         assert(
           distanceToRectangle(x, y, width - 70, width - 22, 22, 70) >= title,
           `${count}: language overlap`,
