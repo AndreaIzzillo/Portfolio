@@ -567,6 +567,11 @@ body {
   background: linear-gradient(180deg, #f4f2ff, #e5e1f0);
 }
 
+.glass-link--presentation {
+  color: #355e50;
+  background: linear-gradient(180deg, #f0fff7, #cde9dc);
+}
+
 @media (hover: hover) {
   .glass-control:hover,
   .glass-link:hover {

@@ -40,6 +40,7 @@ type Messages = {
   previousImage: string;
   code: string;
   demo: string;
+  presentation: string;
   newTab: string;
   portrait: string;
   showImage: (index: number) => string;
@@ -72,6 +73,7 @@ export const messages: Record<Language, Messages> = {
     imageAlt: (n: number, title: string) => `Image ${n} — ${title}`,
     code: "Voir le code",
     demo: "Voir la démo",
+    presentation: "Voir la présentation",
     newTab: "nouvel onglet",
     portrait: "Portrait d’Andrea Izzillo",
     switchLanguage: (next: string) => `Changer de langue : ${next}`,
@@ -98,6 +100,7 @@ export const messages: Record<Language, Messages> = {
     imageAlt: (n: number, title: string) => `Image ${n} — ${title}`,
     code: "View code",
     demo: "Watch demo",
+    presentation: "View presentation",
     newTab: "new tab",
     portrait: "Portrait of Andrea Izzillo",
     switchLanguage: (next: string) => `Switch language to ${next}`,
@@ -124,6 +127,7 @@ export const messages: Record<Language, Messages> = {
     imageAlt: (n: number, title: string) => `${title}の画像${n}`,
     code: "コードを見る",
     demo: "デモを見る",
+    presentation: "発表資料を見る",
     newTab: "新しいタブ",
     portrait: "Andrea Izzilloのポートレート",
     switchLanguage: (next: string) => `言語を${next}に切り替える`,

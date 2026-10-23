@@ -12,7 +12,8 @@ import { ProjectDetails } from "@/components/project-details";
 import { localizeProject, projects as sourceProjects } from "@/data/projects";
 import { usePageVisible } from "@/hooks/use-page-visible";
 import { useElementSize } from "@/hooks/use-element-size";
-import { getProjectOffsets, getProjectSceneHeight } from "@/lib/orbit-layout";
+import { useViewportHeight } from "@/hooks/use-viewport-height";
+import { getProjectLayout } from "@/lib/orbit-layout";
 
 export function ProjectOrbit() {
   const { language, t } = useLanguage();
@@ -36,11 +37,13 @@ export function ProjectOrbit() {
   const activeProject = projects.find((project) => project.id === selected);
   const central = useRef<HTMLDivElement>(null);
   const { ref: scene, width, height } = useElementSize<HTMLDivElement>();
+  const viewportHeight = useViewportHeight();
   const reducedMotion = useReducedMotion();
-  const positions = useMemo(
-    () => getProjectOffsets(width, height, projects.length),
-    [width, height, projects.length],
+  const layout = useMemo(
+    () => getProjectLayout(width, viewportHeight, projects.length),
+    [width, viewportHeight, projects.length],
   );
+  const positions = layout.offsets;
 
   function close() {
     central.current?.querySelector("button")?.focus({ preventScroll: true });
@@ -52,7 +55,7 @@ export function ProjectOrbit() {
     <div
       ref={scene}
       className="project-orbit"
-      style={{ minHeight: `max(100dvh, ${getProjectSceneHeight(width, projects.length)}px)` }}
+      style={{ minHeight: `max(100dvh, ${layout.height}px)` }}
       data-open={open}
       onKeyDown={(event) => {
         if (event.key === "Escape" && open && selected === null && !cvOpen) {
@@ -166,6 +169,7 @@ export function ProjectOrbit() {
                     image={project.cover?.src ?? project.images[0].src}
                     imagePosition={project.cover?.position}
                     imageZoom={project.cover?.zoom}
+                    imageZoomOrigin={project.cover?.zoomOrigin}
                     label={`${t.discover} ${project.title}`}
                     projectTitle={project.title}
                     project

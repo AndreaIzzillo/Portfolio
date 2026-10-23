@@ -14,6 +14,7 @@ type BubbleProps = {
   image: MediaAsset;
   imagePosition?: string;
   imageZoom?: number;
+  imageZoomOrigin?: string;
   active?: boolean;
   label: string;
   projectTitle?: string;
@@ -51,6 +52,7 @@ export function FloatingBubble({
   image,
   imagePosition,
   imageZoom = 1,
+  imageZoomOrigin,
   active = true,
   label,
   projectTitle,
@@ -107,6 +109,7 @@ export function FloatingBubble({
               style={{
                 objectPosition: imagePosition,
                 transform: project ? `scale(${imageZoom})` : "translateY(-4%) scale(1.1)",
+                transformOrigin: project ? imageZoomOrigin : undefined,
               }}
             />
             <span className="portrait-bubble__rim" aria-hidden="true" />

@@ -61,7 +61,7 @@ L’hébergement utilise un export statique : aucun serveur Node.js en productio
 - La galerie conserve les proportions des médias et permet de naviguer au clic
   sur l’image et avec ses commandes. Ne pas réintroduire le bouton « Image suivante »
   superposé à l’image, retiré à la demande d’Andrea.
-- Les liens dépôt et démo YouTube sont indépendants et optionnels : afficher un
+- Les liens dépôt, démo YouTube et présentation PDF sont indépendants et optionnels : afficher un
   bouton uniquement si son URL est renseignée, sans inventer de lien.
 - Le slogan est discret, en petite police sans serif : « Turning a bunch of pixels
   into a » puis « chef d’œuvre » en italique. Il disparaît à l’ouverture des projets.
@@ -97,6 +97,21 @@ Choix actuels à conserver sauf demande de modification :
   Ce n’est pas un ray-tracer. Préciser le cadre du TP et la base WebGL2 fournie ;
   la contribution porte sur les BRDF Lambert et Cook-Torrance GGX, les shaders
   et les textures d’environnement, pas sur la création intégrale du moteur.
+- Raytracer CPU : dépôt `AndreaIzzillo/ISIM-TP-RayTracer`, couverture
+  `RayTracer/suzanne.png`. La galerie reprend `earth.png`, `lights.png` et
+  `suzanne.png` de `museum` ; `bus.png` et le crâne sont exclus à la demande
+  d’Andrea. Le modèle d’éclairage est Phong, confirmé par
+  Andrea après lecture du code ; ne pas le présenter comme Blinn-Phong. Le projet
+  est réalisé en C++17 dans le cadre d’un TP, avec compilation par Make.
+- IVoK Signals : titre « IVoK Signals », sous-titre « Détection de panneaux routiers »
+  / « Traffic sign detection ». Projet en binôme, prototypé en Python puis
+  réimplémenté en C++, combinant localisation par couleurs et contours, HOG,
+  histogramme HSV, statistiques de couleur et deux SVM. L’archive fournie contient
+  le script d’évaluation et les documents, mais pas le détecteur complet : ne pas
+  extrapoler ses dépendances. Couverture `IVoKSignals/two.png`, cadrée sur les deux
+  panneaux à gauche avec la position `-30% 50%`, le zoom `2.35` et
+  `zoomOrigin: "40% 70%"` pour descendre le cadrage ; galerie avec les quatre images fournies (`bright`,
+  `dark`, `two`, `boxes`). Présentation : `/presentations/ivok-signals.pdf`.
 - Portrait : `portrait.jpg`. Le cadrage combine `object-fit: cover` et la position
   CSS dans `.portrait-bubble__image` avec `translateY(-4%) scale(1.1)` dans
   `portrait-bubble.tsx`. Les couvertures utilisent leurs propres `position` et
@@ -129,6 +144,13 @@ et avec un sous-chemin.
 ## Documentation technique
 
 Portfolio Next.js exporté en site statique pour GitHub Pages.
+
+L’icône du site provient de `assets/branding/site-icon.webp`. Les variantes
+versionnées suivent les conventions Next.js : `src/app/favicon.ico` (16, 32 et
+48 px), `src/app/icon.png` (192 px) et `src/app/apple-icon.png` (180 px).
+Conserver la transparence et les proportions lors de leur remplacement ; les
+marges transparentes de l’original sont retirées avant le redimensionnement.
+Next.js génère les liens d’icônes, y compris avec un sous-chemin d’hébergement.
 
 ## Développement
 
@@ -176,6 +198,15 @@ une empreinte qui change avec le contenu ou les paramètres. Les paramètres de
 qualité et de taille se trouvent dans `scripts/optimize-media.mjs`.
 `FFMPEG_PATH` et `FFPROBE_PATH` permettent de préciser les exécutables.
 
+Les présentations PDF sont versionnées dans `public/presentations/` et référencées
+par le champ optionnel `presentationUrl` de `src/data/projects.ts`. Ce lien est
+transmis par `localizeProject` et affiche « Voir la présentation » / « View
+presentation » dans les actions de la fiche, même sans dépôt ou démo. Sa variante
+`glass-link--presentation` utilise une teinte menthe, distincte du code et de la
+démo mauve. Le PDF
+s’ouvre dans un nouvel onglet ; les chemins locaux utilisent `mediaUrl` pour le
+sous-chemin d’hébergement, tandis que les URL externes restent inchangées.
+
 ## CV et ressources du portfolio
 
 La colonne de boutons en haut à gauche est définie dans `ProjectOrbit` et reste
@@ -205,6 +236,35 @@ npm run media:build
 
 Les CV actuels tiennent sur une page. Adapter le modèle et l’affichage si un
 remplacement comporte plusieurs pages, plutôt que de n’en afficher que la première.
+
+## Placement des bulles
+
+`getProjectLayout` dans `src/lib/orbit-layout.ts` calcule une ellipse virtuelle
+centrée sur le portrait et adaptée à la largeur de la scène et à la hauteur du
+viewport. L’ovale reste central : sa largeur cible représente 62 % de l’écran,
+avec un plafond de 1 280 px et une réduction supplémentaire si les marges des
+bulles l’exigent. Deux bandes libres de 80 à 144 px en haut et en bas sont
+réservées aux futures commandes et aux filtres. Ces paramètres sont centralisés
+en tête du module ; les filtres eux-mêmes ne sont pas encore implémentés.
+Les bulles s’y répartissent selon la longueur d’arc disponible, avec
+de petites variations déterministes. Ne pas réintroduire la grille à partir
+de six projets ou un espacement par angles égaux qui tasse les bulles aux
+extrémités d’une ellipse aplatie.
+
+Le calcul réserve de l’espace pour le portrait, les boutons dans les coins,
+le flottement, le magnétisme, le survol et les titres circulaires. Les portions
+de l’ellipse trop proches du portrait ou des commandes ne reçoivent pas de bulle.
+Plusieurs rotations sont comparées pour conserver des distances suffisantes et
+équilibrer la composition. Si l’espace manque, notamment sur mobile, la scène
+s’allonge verticalement ; les bulles gardent leurs tailles CSS responsives.
+
+La hauteur du viewport est suivie par `useViewportHeight`, indépendamment de
+la hauteur de scène calculée, pour éviter une boucle de redimensionnement.
+Le placement est mémorisé selon la largeur, la hauteur du viewport et le nombre
+de projets ; il ne dépend ni de la langue ni de l’ouverture des fiches et ne
+s’exécute pas à chaque image. Les particules utilisent les mêmes destinations.
+Les tests `tests/orbit-layout.test.mjs` couvrent les limites, les collisions,
+l’équilibre, l’ellipse, l’espacement curviligne et la stabilité du placement.
 
 ## Budget d’animation
 

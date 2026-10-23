@@ -7,6 +7,7 @@ import { useLanguage } from "@/components/language-provider";
 import { LanguageToggle } from "@/components/language-toggle";
 import { ProjectGallery } from "@/components/project-gallery";
 import type { Project } from "@/data/projects";
+import { mediaUrl } from "@/lib/media";
 
 export function ProjectDetails({
   project,
@@ -71,7 +72,7 @@ export function ProjectDetails({
             {project.stack.join(" · ")}
           </p>
         )}
-        {(project.repoUrl || project.demoUrl) && (
+        {(project.repoUrl || project.demoUrl || project.presentationUrl) && (
           <div className="project-detail__actions">
             {project.repoUrl && (
               <a
@@ -102,6 +103,34 @@ export function ProjectDetails({
               >
                 <span aria-hidden="true">▷</span> {t.demo}
                 <span className="sr-only"> (YouTube, {t.newTab})</span>
+              </a>
+            )}
+            {project.presentationUrl && (
+              <a
+                className="glass-link glass-link--presentation"
+                href={
+                  project.presentationUrl.startsWith("/")
+                    ? mediaUrl(project.presentationUrl)
+                    : project.presentationUrl
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  width="18"
+                  height="18"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M3 3h18M4 3v12h16V3M12 15v6m-4 0 4-4 4 4" />
+                </svg>
+                {t.presentation}
+                <span className="sr-only"> (PDF, {t.newTab})</span>
               </a>
             )}
           </div>
