@@ -260,6 +260,24 @@ s’allonge verticalement ; les bulles gardent leurs tailles CSS responsives.
 
 La hauteur du viewport est suivie par `useViewportHeight`, indépendamment de
 la hauteur de scène calculée, pour éviter une boucle de redimensionnement.
+La hauteur de l’ellipse calculée ne s’applique que lorsque les projets sont
+ouverts ou en cours de fermeture. L’accueil fermé reste à `100dvh`, avec un
+portrait centré et le slogan positionné en absolu, y compris sur les écrans bas.
+`useOrbitExpansion` gère les états `closed`, `open`, `closing` avec le réducteur
+de `src/lib/orbit-expansion.ts`. `AnimatePresence.onExitComplete` autorise le
+repli après la sortie des bulles ; une réouverture annule ce repli. La réduction
+des animations et une scène vide permettent une fermeture immédiate.
+
+Le changement de hauteur est compensé avant l’affichage via `useLayoutEffect`
+et un ajustement du défilement, en prenant le portrait comme point d’ancrage.
+Pendant l’exploration, les changements de hauteur de scène ou de viewport sont
+également compensés pour garder ce repère lors d’un redimensionnement.
+Lorsque le retour à une page d’un écran empêche de conserver l’ancien défilement,
+le portrait termine son retour avec une transformation native de 300 ms, sauf
+en mode de réduction des animations. Ne pas animer la hauteur à chaque image.
+La scène désactive l’ancrage automatique du navigateur (`overflow-anchor`) pour
+laisser cette compensation gérer les transitions.
+
 Le placement est mémorisé selon la largeur, la hauteur du viewport et le nombre
 de projets ; il ne dépend ni de la langue ni de l’ouverture des fiches et ne
 s’exécute pas à chaque image. Les particules utilisent les mêmes destinations.
