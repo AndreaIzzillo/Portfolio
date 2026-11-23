@@ -4,10 +4,11 @@ import { useState } from "react";
 
 import { BubbleDialog, type BubbleOrigin } from "@/components/bubble-dialog";
 import { useLanguage } from "@/components/language-provider";
+import { ProjectBackdrop } from "@/components/project-backdrop";
 import { LanguageToggle } from "@/components/language-toggle";
 import { ProjectGallery } from "@/components/project-gallery";
 import type { Project } from "@/data/projects";
-import { mediaUrl } from "@/lib/media";
+import { imageSource, mediaUrl } from "@/lib/media";
 
 export function ProjectDetails({
   project,
@@ -24,6 +25,8 @@ export function ProjectDetails({
 }) {
   const { t } = useLanguage();
   const [entered, setEntered] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeImage = project.images[activeIndex] ?? project.images[0];
 
   return (
     <BubbleDialog
@@ -35,6 +38,7 @@ export function ProjectDetails({
       onRequestClose={onRequestClose}
       onDismiss={onDismiss}
       onEntered={() => setEntered(true)}
+      backdrop={<ProjectBackdrop src={imageSource(activeImage.src, 240)} closing={closing} />}
     >
       <LanguageToggle inDialog />
       <button
@@ -57,7 +61,12 @@ export function ProjectDetails({
         </svg>
       </button>
 
-      <ProjectGallery images={project.images} active={entered && !closing} />
+      <ProjectGallery
+        images={project.images}
+        activeIndex={activeIndex}
+        onSelectImage={setActiveIndex}
+        active={entered && !closing}
+      />
 
       <div className="project-detail__content">
         <h2 id="project-detail-title">{project.title}</h2>

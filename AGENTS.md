@@ -230,6 +230,11 @@ sous-chemin d’hébergement, tandis que les URL externes restent inchangées.
 La colonne de boutons en haut à gauche est définie dans `ProjectOrbit` et reste
 verticale lors de l’ajout de ressources. Les boutons CV, LinkedIn puis GitHub affichent
 uniquement leurs icônes, avec des libellés accessibles et des infobulles.
+La colonne et le sélecteur de langue global apparaissent à l’ouverture des
+projets depuis le portrait, puis se retirent en cascade inverse pendant leur
+fermeture. `globals.css` anime l’opacité, la translation et l’échelle. Les
+commandes deviennent inactives dès le début de la fermeture. Le focus visible
+et la préférence de réduction des animations les affichent immédiatement.
 LinkedIn ouvre le profil `https://www.linkedin.com/in/andreaizzillo/` dans un
 nouvel onglet. GitHub ouvre `https://github.com/AndreaIzzillo` dans un nouvel onglet.
 Le moteur de placement réserve l’espace de ces trois boutons. Le bouton CV ouvre `CvDetails` ;
@@ -305,9 +310,25 @@ l’équilibre, l’ellipse, l’espacement curviligne et la stabilité du place
 
 `ProjectFilters` affiche une barre de verre pastel fixe en bas du viewport quand
 les projets sont ouverts, masquée pendant une fiche projet ou le CV. Les cinq
-choix (Tout, Mes favoris, Synthèse, Traitement, GPU) forment un groupe radio accessible, avec
-navigation par flèches, Début et Fin. Un curseur se déplace par transformation CSS
-et respecte les animations réduites. Le choix est conservé jusqu’au rechargement.
+choix (Tout, Mes favoris, Synthèse, Traitement, GPU) sont affichés par des icônes
+avec un seul libellé visible au-dessus de la lentille. Les boutons conservent
+leurs noms accessibles et la navigation par flèches, Début et Fin. La lentille de verre
+gonfle au survol du choix actif, pendant une sélection ou quand on la maintient.
+Le glissement peut commencer
+sur toute la barre et suit le pointeur sans filtrer les projets. À la fin du geste,
+la dernière catégorie traversée par le centre de la lentille est validée, même si
+le navigateur interrompt le glissement. Un appui interrompu avant tout glissement
+laisse le choix actif. La préférence de réduction des animations retire le
+gonflement et le mouvement de rappel.
+Le choix est conservé jusqu’au rechargement.
+`ProjectFilterOptics` dessine les cinq pictogrammes dans une seule surface
+WebGL transparente avec les tracés des boutons. Les SVG des boutons sont alors
+masqués. Le shader conserve les formes au repos et décale l’échantillonnage
+seulement dans l’anneau de la lentille gonflée. Il réagit aux changements de
+position, d’échelle et de taille sur la même image que les transformations
+Motion. Le déplacement monte progressivement côté intérieur et revient
+rapidement à zéro côté extérieur pour comprimer les formes au bord sans
+replier le tracé. Les SVG prennent le relais si le WebGL manque ou perd son contexte.
 `filterProjects` dans `src/lib/project-filters.ts` conserve l’ordre des données et
 autorise plusieurs catégories par projet. La même liste filtrée pilote les bulles,
 le placement et les destinations visibles des particules. Les clés restent les
@@ -354,6 +375,13 @@ Garder le rayon des coins fixe et faire apparaître le flou d’arrière-plan de
 par un fondu d’opacité : ne pas animer `border-radius` ou `backdrop-filter` sur
 toute la durée de l’ouverture/fermeture. Les vidéos de la galerie démarrent après
 l’entrée de la fiche et se mettent en pause dès le début de sa fermeture.
+
+`ProjectDetails` partage l’index de la galerie avec `ProjectBackdrop`. Dans une
+fiche projet, le fond natif flouté se teinte progressivement avec la variante
+WebP de 240 px du média sélectionné (l’image d’attente pour une vidéo). Le fond
+précédent reste visible jusqu’au décodage de la nouvelle image, puis les calques
+se fondent en animant leur opacité avec un flou fixe. Le calque est décoratif et
+laisse passer le clic extérieur. Il s’efface à la fermeture de la fiche.
 
 Pour comparer la fluidité, utiliser un export de production avec le même viewport,
 la même densité d’écran et les mêmes actions : accueil, ouverture des bulles,
