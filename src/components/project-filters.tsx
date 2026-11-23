@@ -1,7 +1,7 @@
 "use client";
 
 import { m, useReducedMotion } from "motion/react";
-import { useRef } from "react";
+import { useRef, type CSSProperties } from "react";
 
 import { useLanguage } from "@/components/language-provider";
 import { projectFilters, type ProjectFilter } from "@/lib/project-filters";
@@ -31,6 +31,7 @@ export function ProjectFilters({
       <div
         ref={group}
         className="project-filters__track"
+        style={{ "--project-filter-count": projectFilters.length } as CSSProperties}
         role="radiogroup"
         aria-label={t.projectFilters}
         onKeyDown={(event) => {

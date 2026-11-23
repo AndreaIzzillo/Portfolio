@@ -1,4 +1,4 @@
-export const projectFilters = ["all", "graphics", "processing", "gpu"] as const;
+export const projectFilters = ["all", "favorites", "graphics", "processing", "gpu"] as const;
 export type ProjectFilter = (typeof projectFilters)[number];
 export type ProjectCategory = Exclude<ProjectFilter, "all">;
 

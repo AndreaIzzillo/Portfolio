@@ -72,9 +72,10 @@ Ajouter une entrée à `projects` dans `src/data/projects.ts` avec un identifian
 unique et stable, au moins un média, une traduction française et sa version
 anglaise. Le placement et les particules prennent automatiquement en compte la
 liste. La couverture peut être différente du premier média de la galerie.
-Le champ `categories` contient une ou plusieurs valeurs `graphics`, `processing`,
-`gpu`, indépendantes de la langue. Elles pilotent les filtres Synthèse, Traitement
-et GPU ; ne pas déduire les catégories automatiquement depuis les stacks.
+Le champ `categories` contient une ou plusieurs valeurs `favorites`, `graphics`,
+`processing` ou `gpu`, indépendantes de la langue. AtmoGL, OuterGL et Doom-Like
+figurent dans Mes favoris. Les catégories sont renseignées dans les données du
+projet.
 
 Les descriptions reprennent le style d’Andrea : courtes, concrètes, semi-formelles,
 avec les techniques réellement utilisées et sans surévaluer sa contribution.
@@ -115,6 +116,20 @@ Choix actuels à conserver sauf demande de modification :
   panneaux à gauche avec la position `-30% 50%`, le zoom `2.35` et
   `zoomOrigin: "40% 70%"` pour descendre le cadrage ; galerie avec les quatre images fournies (`bright`,
   `dark`, `two`, `boxes`). Présentation : `/presentations/ivok-signals.pdf`.
+- AtmoGL (`AndreaIzzillo/AtmoGL`) figure dans Synthèse et GPU. Réalisé en C++17
+  et OpenGL 4.3 pour le cours POGLA à l’EPITA, il s’appuie sur les travaux de
+  Sébastien Hillaire pour le rendu atmosphérique. La couverture utilise
+  `AtmoGL/large.png`, la quatrième image, avec un zoom de `2.4` et le soleil
+  légèrement à droite du centre (`position: "52.25% 50%"`, `zoomOrigin: "50% 43.4%"`).
+  La galerie reprend les cinq
+  captures de `museum/` et le lien vidéo du dépôt apparaît en tant que démo.
+- Hackathon F3D (`AndreaIzzillo/f3d`, branche `hackathon/demo`) figure dans
+  Synthèse et GPU. Réalisé en équipe à l’EPITA, le prototype expose le tampon de
+  profondeur au shader final de F3D. Les tickets amont
+  [#3730](https://github.com/f3d-app/f3d/issues/3730) et
+  [#3731](https://github.com/f3d-app/f3d/issues/3731) concernent respectivement
+  l’accès au tampon et la profondeur de champ native. La galerie reprend les
+  trois captures fournies, avec `F3DHackathon/depth-gradient.png` en couverture.
 - Portrait : `portrait.jpg`. Le cadrage combine `object-fit: cover` et la position
   CSS dans `.portrait-bubble__image` avec `translateY(-4%) scale(1.1)` dans
   `portrait-bubble.tsx`. Les couvertures utilisent leurs propres `position` et
@@ -289,8 +304,8 @@ Les tests `tests/orbit-layout.test.mjs` couvrent les limites, les collisions,
 l’équilibre, l’ellipse, l’espacement curviligne et la stabilité du placement.
 
 `ProjectFilters` affiche une barre de verre pastel fixe en bas du viewport quand
-les projets sont ouverts, masquée pendant une fiche projet ou le CV. Les quatre
-choix (Tout, Synthèse, Traitement, GPU) forment un groupe radio accessible, avec
+les projets sont ouverts, masquée pendant une fiche projet ou le CV. Les cinq
+choix (Tout, Mes favoris, Synthèse, Traitement, GPU) forment un groupe radio accessible, avec
 navigation par flèches, Début et Fin. Un curseur se déplace par transformation CSS
 et respecte les animations réduites. Le choix est conservé jusqu’au rechargement.
 `filterProjects` dans `src/lib/project-filters.ts` conserve l’ordre des données et
