@@ -47,6 +47,7 @@ const { ProjectDetails } = await loadModule("../src/components/project-details.t
   },
   "@/components/language-provider": { useLanguage: () => ({ t: languages.messages[language] }) },
   "@/components/language-toggle": { LanguageToggle: () => null },
+  "@/components/project-backdrop": { ProjectBackdrop: () => null },
   "@/components/project-gallery": { ProjectGallery: () => null },
   "@/lib/media": media,
 });

@@ -3,7 +3,6 @@
 import { ResponsiveImage } from "@/components/responsive-image";
 import { LoopingVideo } from "@/components/looping-video";
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
-import { useState } from "react";
 
 import { useLanguage } from "@/components/language-provider";
 import type { ProjectImage } from "@/data/projects";
@@ -11,18 +10,24 @@ import type { NonEmptyArray } from "@/lib/arrays";
 
 type ProjectGalleryProps = {
   images: NonEmptyArray<ProjectImage>;
+  activeIndex: number;
+  onSelectImage: (index: number) => void;
   active?: boolean;
 };
 
-export function ProjectGallery({ images, active = true }: ProjectGalleryProps) {
+export function ProjectGallery({
+  images,
+  activeIndex,
+  onSelectImage,
+  active = true,
+}: ProjectGalleryProps) {
   const { t } = useLanguage();
-  const [activeIndex, setActiveIndex] = useState(0);
   const reducedMotion = useReducedMotion();
   const hasMultipleImages = images.length > 1;
   const activeImage = images[activeIndex] ?? images[0];
 
   function selectRelativeImage(direction: number) {
-    setActiveIndex((current) => (current + direction + images.length) % images.length);
+    onSelectImage((activeIndex + direction + images.length) % images.length);
   }
 
   return (
@@ -104,7 +109,7 @@ export function ProjectGallery({ images, active = true }: ProjectGalleryProps) {
                 type="button"
                 aria-label={t.showImage(index + 1)}
                 aria-current={index === activeIndex ? "true" : undefined}
-                onClick={() => setActiveIndex(index)}
+                onClick={() => onSelectImage(index)}
               />
             ))}
           </div>

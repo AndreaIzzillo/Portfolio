@@ -15,6 +15,7 @@ export function BubbleDialog({
   onRequestClose,
   onDismiss,
   onEntered,
+  backdrop,
   children,
 }: {
   id: string;
@@ -26,6 +27,7 @@ export function BubbleDialog({
   onRequestClose: () => void;
   onDismiss: () => void;
   onEntered?: () => void;
+  backdrop?: ReactNode;
   children: ReactNode;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -74,6 +76,7 @@ export function BubbleDialog({
         if (event.target === event.currentTarget) onRequestClose();
       }}
     >
+      {backdrop}
       <m.article
         className={`project-detail ${className}`.trim()}
         initial={collapsed}
