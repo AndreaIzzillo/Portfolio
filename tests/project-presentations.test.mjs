@@ -87,8 +87,21 @@ test("filters keep source order and allow projects in multiple categories", () =
   const gpu = filterProjects(projects, "gpu");
   const graphics = filterProjects(projects, "graphics");
   const byTitle = (list) => list.map((project) => project.translations.fr.title);
+  assert.deepEqual(byTitle(filterProjects(projects, "favorites")), [
+    "OuterGL",
+    "Moteur Doom-Like",
+    "AtmoGL",
+  ]);
   assert.deepEqual(byTitle(processing), ["ChromAura", "Projet GPGPU", "IVoK Signals"]);
-  assert.deepEqual(byTitle(gpu), ["OuterGL", "Projet GPGPU", "Moteur de rendu PBR"]);
+  assert.deepEqual(byTitle(gpu), [
+    "OuterGL",
+    "Projet GPGPU",
+    "Moteur de rendu PBR",
+    "AtmoGL",
+    "Hackathon F3D",
+  ]);
+  assert(byTitle(graphics).includes("Hackathon F3D"));
+  assert(byTitle(graphics).includes("AtmoGL"));
   assert(graphics.some((project) => project.translations.fr.title === "Raytracer CPU"));
   assert(!gpu.some((project) => project.translations.fr.title === "Raytracer CPU"));
   assert.deepEqual(filterProjects([], "gpu"), []);

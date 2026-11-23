@@ -3,6 +3,11 @@ import { getMedia, type MediaAsset } from "@/lib/media";
 import { mapNonEmpty, type NonEmptyArray } from "@/lib/arrays";
 import { messages, type Language } from "@/lib/languages";
 import type { ProjectCategory } from "@/lib/project-filters";
+const atmoGLBanner = getMedia("AtmoGL/banner.png");
+const atmoGLDay = getMedia("AtmoGL/day.png");
+const atmoGLLarge = getMedia("AtmoGL/large.png");
+const atmoGLSpace = getMedia("AtmoGL/space.png");
+const atmoGLSunset = getMedia("AtmoGL/sunset.png");
 const chromAuraAura = getMedia("ChromAura/aura.png");
 const chromAuraColorful = getMedia("ChromAura/colorful.png");
 const chromAuraGunner = getMedia("ChromAura/gunner.png");
@@ -14,6 +19,9 @@ const doomLikeDemoMc = getMedia("DoomLike/demo_mc.gif");
 const doomLikeDoom = getMedia("DoomLike/doom.png");
 const doomLikeMc = getMedia("DoomLike/mc.png");
 const doomLikeShining = getMedia("DoomLike/shining.png");
+const f3dHackathonCar = getMedia("F3DHackathon/car.png");
+const f3dHackathonChristmas = getMedia("F3DHackathon/christmas.png");
+const f3dHackathonDepthGradient = getMedia("F3DHackathon/depth-gradient.png");
 const gpgpuPeople = getMedia("GPGPU/people.png");
 const ivokSignalsBoxes = getMedia("IVoKSignals/boxes.png");
 const ivokSignalsBright = getMedia("IVoKSignals/bright.png");
@@ -71,7 +79,7 @@ export type ProjectDefinition = {
 export const projects: ProjectDefinition[] = [
   {
     id: 1,
-    categories: ["graphics", "gpu"],
+    categories: ["graphics", "gpu", "favorites"],
     stack: ["C++17", "OpenGL 4.3", "GLSL", "GLEW", "FreeGLUT", "GLM", "tinygltf", "CMake"],
     cover: { src: outerGLNewStart, position: "45% 50%", zoom: 1.85 },
     images: [
@@ -105,7 +113,7 @@ export const projects: ProjectDefinition[] = [
   },
   {
     id: 2,
-    categories: ["graphics"],
+    categories: ["graphics", "favorites"],
     stack: ["C++17", "SFML 3", "OpenMP", "CMake"],
     cover: { src: doomLikeMc, position: "20% 50%" },
     images: [
@@ -265,6 +273,72 @@ export const projects: ProjectDefinition[] = [
         subtitle: "Traffic sign detection",
         description:
           "Traffic sign detection and recognition program developed in a team of two, prototyped in Python then reimplemented in C++. Candidate regions are located using colours and contours, then described using HOG features, an HSV histogram and colour statistics. A first SVM separates signs from the background, and a second identifies their class.",
+      },
+    },
+  },
+  {
+    id: 8,
+    categories: ["graphics", "gpu", "favorites"],
+    stack: [
+      "C++17",
+      "OpenGL 4.3",
+      "GLSL",
+      "GLEW",
+      "FreeGLUT",
+      "GLM",
+      "Dear ImGui",
+      "CMake",
+      "vcpkg",
+    ],
+    cover: { src: atmoGLLarge, position: "52.25% 50%", zoom: 2.4, zoomOrigin: "50% 43.4%" },
+    images: [
+      { src: atmoGLBanner },
+      { src: atmoGLDay },
+      { src: atmoGLSunset },
+      { src: atmoGLLarge },
+      { src: atmoGLSpace },
+    ],
+    repoUrl: "https://github.com/AndreaIzzillo/AtmoGL",
+    demoUrl: "https://youtu.be/p67JqIY6LQ0",
+    translations: {
+      fr: {
+        title: "AtmoGL",
+        subtitle: "Rendu atmosphérique en temps réel",
+        description:
+          "Développement d’un moteur de rendu atmosphérique en C++ et OpenGL dans le cadre du cours POGLA à l’EPITA, d’après les travaux de Sébastien Hillaire. Simulation de la diffusion simple de Rayleigh et de Mie et de l’absorption par l’ozone. Des shaders de calcul génèrent les tables utilisées pour le rendu du ciel, l’atténuation de la lumière solaire et la perspective aérienne au-dessus d’un relief montagneux procédural.",
+      },
+      en: {
+        title: "AtmoGL",
+        subtitle: "Real-time atmospheric rendering",
+        description:
+          "Atmospheric renderer developed in C++ and OpenGL for EPITA’s advanced OpenGL course, based on Sébastien Hillaire’s work. It simulates Rayleigh and Mie single scattering and ozone absorption. Compute shaders generate lookup tables for sky rendering, sunlight attenuation and aerial perspective over procedural mountain terrain.",
+      },
+    },
+  },
+  {
+    id: 9,
+    categories: ["graphics", "gpu"],
+    stack: ["C++20", "VTK", "OpenGL", "GLSL", "CMake"],
+    cover: { src: f3dHackathonDepthGradient, position: "53% 50%" },
+    images: [
+      { src: f3dHackathonCar },
+      { src: f3dHackathonChristmas },
+      { src: f3dHackathonDepthGradient },
+    ],
+    repoUrl: "https://github.com/AndreaIzzillo/f3d/tree/hackathon/demo",
+    demoUrl: "https://www.youtube.com/watch?v=lwP6KgxDHjs",
+    translations: {
+      fr: {
+        title: "Hackathon F3D",
+        subtitle: "Effets de post-traitement pilotés par la profondeur",
+        description:
+          "Développement en équipe, lors d’un hackathon à l’EPITA, d’un prototype qui donne au shader final de F3D accès au tampon de profondeur. Cette donnée permet de créer des effets en GLSL, comme un flou d’arrière-plan ou une coloration selon la distance à la caméra. Les mainteneurs ont salué le prototype et ouvert deux tickets pour intégrer l’accès au tampon (#3730) et ajouter une profondeur de champ native (#3731).",
+      },
+      en: {
+        title: "F3D Hackathon",
+        subtitle: "Depth-based post-processing effects",
+        description:
+          "Team prototype built during a hackathon at EPITA to give F3D’s final shader access to the depth buffer. This enables GLSL effects such as background blur and colouring based on distance from the camera. The maintainers praised the prototype and opened two issues to expose the depth buffer (#3730) and add native depth of field (#3731).",
       },
     },
   },
